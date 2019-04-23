@@ -1,0 +1,33 @@
+.card {
+        width: 80vw;
+        display: flex !important;
+        margin: 2vh auto;
+        .card-body {
+                display: flex;
+                justify-content: space-between;
+                .content_body {
+                        width: 50vw;
+                }
+                .other_info {
+                        display: flex;
+                        flex-direction: column;
+                        font-size: 20px;
+                        justify-content: space-between;
+                        align-items: flex-end;
+                        .tag_name {
+                                font-size: 20px;
+                        }
+                        .like_post {
+                                display: flex;
+                                padding-top: 5px;
+                                align-items: center;
+                                .like_number {
+                                        margin: 0 auto;
+                                        padding-left: 4px;
+                                }
+                        }
+
+                }
+        }
+
+}
