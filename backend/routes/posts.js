@@ -12,16 +12,9 @@ function appendStringParen(queryParam) {
 	return '(' + queryParam + ')';
 }
 
-// Get all lists of tasks (So far in our fakeDB first)
+// Get all lists of posts
 router.get('/', function(req, res) {
-	// Moongoose use...
 	const query = req.query;
-	console.log(req.query);
-	console.log("(" + req.query.where + ")");
-	console.log(req.query.sort);
-	console.log(req.query.select);
-	console.log(req.query.skip);
-	console.log(req.query.limit);
 	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
 	const selectParam = query.select ? eval(appendStringParen(query.select)) : {};
 	const sortParam = query.sort ? eval(appendStringParen(query.sort)) : {};
@@ -45,9 +38,52 @@ router.get('/', function(req, res) {
 });
 
 
-// Get certain task based on task ID
+router.get('/category', function(req, res) {
+
+	const query = req.query;
+	// If not specified, then its just throwing out all posts
+	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
+	
+	Post.find(whereParam).exec()
+	.then((task) => {
+		if (task) {
+			res.status(200).send({
+				message: `OK. Post Category found.`,
+				data:task
+			});
+		} else {
+			res.status(404).send({
+				message: `Cannot Find Post of Post Category`,
+				data:[]
+			});
+		}
+	}).catch((error) => {
+		res.status(500).send({
+			message: `Server Error: ${error.name}: Cast to number failed for value '${error.value}' at path '${error.path}' for model 'Post' `,
+			data:[]
+		})
+	});
+})
+
+
+// Get certain post based on UserID 
+// or --> Get all lists of posts based on category type (when they are clicked) and filter out those posted
+// by the UserID (Since they wouldn't want to see their own posts) By using the extra queries within the urls
+// By using ?where={"category":[categoryTypeString]}  (STill thinking of how to get it to work in JS & Mongoose)
 router.get('/:id', function(req, res) {
-	Post.findOne({_id: req.params.id}).exec()
+
+	const query = req.query;
+	// If not specified, then its just throwing out all posts created by that user...
+	const whereParam = query.where ? eval(appendStringParen(query.where)) : {postedBy: req.params.id};
+	console.log(whereParam);
+	let requestParamString = `${req.params.id}`;
+	// console.log(eval(requestParamString));
+	// console.log(eval("{'$not': requestParamString}"));
+	// if (query.where) {
+	// 	whereParam["postedBy"] = {"$not": req.params.id};
+	// }
+	
+	Post.find(whereParam).exec()
 	.then((task) => {
 		if (task) {
 			res.status(200).send({
@@ -61,7 +97,6 @@ router.get('/:id', function(req, res) {
 			});
 		}
 	}).catch((error) => {
-		console.log(error);
 		res.status(500).send({
 			message: `Server Error: ${error.name}: Cast to number failed for value '${error.value}' at path '${error.path}' for model 'Post' `,
 			data:[]
