@@ -15,7 +15,7 @@ function appendStringParen(queryParam) {
 }
 
 
-// Get all lists of users (So far in our fakeDB first)
+// Get all lists of users (So far in our fakeDB first)  ? Add in where={university:value} to get users based on University
 router.get('/', function(req, res) {
 	const query = req.query;
 
@@ -30,7 +30,7 @@ router.get('/', function(req, res) {
 	.exec()
 	.then((users_list) => {
 		res.status(200).send({
-			message: countTrue ? "OK. Returned total count of retrieved data." : "OK. List of Users. Wha?",
+			message: countTrue ? "OK. Returned total count of retrieved data." : "OK. List of Users.",
 			data: countTrue ? users_list.length : users_list
 		});
 	}).catch((err) => {
@@ -41,9 +41,14 @@ router.get('/', function(req, res) {
 	});
 });
 
-// Get certain user based on user ID
+// Get certain user based on user ID.
 router.get('/:id', function(req, res) {
-	User.findOne({_id: req.params.id}).exec()
+	const query = req.query;
+
+	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
+	whereParam._id = req.params.id;
+
+	User.findOne(whereParam).exec()
 	.then((user) => {
 		if (user) {
 			res.status(200).send({

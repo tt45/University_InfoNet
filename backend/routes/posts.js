@@ -37,7 +37,8 @@ router.get('/', function(req, res) {
 		});
 });
 
-
+// Used to get posts based on the clicked category. MUST HAVE  ?where={"category":[categoryTypeString]}  QUERY!
+// Or else just pass back ALL posts
 router.get('/category', function(req, res) {
 
 	const query = req.query;
@@ -66,22 +67,13 @@ router.get('/category', function(req, res) {
 })
 
 
-// Get certain post based on UserID 
-// or --> Get all lists of posts based on category type (when they are clicked) and filter out those posted
-// by the UserID (Since they wouldn't want to see their own posts) By using the extra queries within the urls
-// By using ?where={"category":[categoryTypeString]}  (STill thinking of how to get it to work in JS & Mongoose)
+// Get certain post based on UserID   Can put queries at the end 
 router.get('/:id', function(req, res) {
 
 	const query = req.query;
 	// If not specified, then its just throwing out all posts created by that user...
-	const whereParam = query.where ? eval(appendStringParen(query.where)) : {postedBy: req.params.id};
-	console.log(whereParam);
-	let requestParamString = `${req.params.id}`;
-	// console.log(eval(requestParamString));
-	// console.log(eval("{'$not': requestParamString}"));
-	// if (query.where) {
-	// 	whereParam["postedBy"] = {"$not": req.params.id};
-	// }
+	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
+	whereParam.postedBy = req.params.id;
 	
 	Post.find(whereParam).exec()
 	.then((task) => {
