@@ -75,7 +75,7 @@ router.get('/:id', function(req, res) {
 	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
 	whereParam.postedBy = req.params.id;
 	
-	Post.find(whereParam).exec()
+	Post.findOne(whereParam).exec()
 	.then((task) => {
 		if (task) {
 			res.status(200).send({
