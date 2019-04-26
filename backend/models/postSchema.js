@@ -2,9 +2,9 @@ var mongoose = require("mongoose");
 
 var postSchema = new mongoose.Schema({
     title: String,
-    contenxt: String,
+    context: String,
     category: String,
-    likeCount: Number,
+    likeCount: {type: Number, default: 0},
     createdTime: {type: Date, default: Date.now},
     university: String,
     postedBy: {
