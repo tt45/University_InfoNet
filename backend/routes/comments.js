@@ -11,6 +11,11 @@ router.use(express.json());
 router.get('/', function(req, res) {
 
     Comment.find({}).then((comments) => {
+        if (comments.length === 0) {
+            return res.status(404).json({
+                message: "Comment not exist!"
+            }); 
+        }
         res.status(200).send({
             message: `All the comments hahaha`,
             data: comments
@@ -27,14 +32,27 @@ router.get('/', function(req, res) {
 router.get('/:id', function(req, res) {
 
     Comment.findOne({_id: req.params.id}).then((comments) => {
+<<<<<<< HEAD
+=======
+        if (!comments) {
+            return res.status(404).json({
+                message: "Comment does not exist!"
+            });
+        }
+>>>>>>> Yidan
         res.status(200).send({
             message: `Comment with ID: ${req.params.id} Found!`,
             data: comments
         });
     }).catch(err => {
+<<<<<<< HEAD
         res.status(404).send({
             message: `No comment of ID : ${req.params.id}`,
             data: []
+=======
+        res.status(500).send({
+            error: err
+>>>>>>> Yidan
         });
     })
 });
