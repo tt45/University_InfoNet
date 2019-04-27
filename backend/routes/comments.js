@@ -3,11 +3,12 @@ var express = require('express'),
     Comment = require('../models/commentSchema'),
     User = require('../models/userSchema'),
     Post = require('../models/postSchema'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    auth = require('./auth');
 
 router.use(express.json());
 
-// returns ALL comments there ever is... (Do not use if there are millions of comments)
+
 router.get('/', function(req, res) {
 
     Comment.find({}).then((comments) => {
@@ -48,7 +49,7 @@ router.get('/:id', function(req, res) {
 });
 
 // Get all comments commented by user based on user_id
-router.get('/user/:user_id', function(req, res) {
+router.get('/user/:user_id', auth.required, function(req, res) {
 
     Comment.findOne({commentedBy: req.params.user_id}).then((comments) => {
         if (!comments) {
@@ -102,8 +103,9 @@ router.get('/post/:post_id', function(req, res) {
     })
 });
 
-// Udate comment based on commentID
-router.put('/:id', function(req, res) {
+
+// Update comment based on commentID
+router.put('/:id', auth.required, function(req, res) {
     // field in req.body: context
     Comment.findOne({_id: req.params.id}).exec().then(comment => {
         if (!comment) {
@@ -134,7 +136,7 @@ router.put('/:id', function(req, res) {
 
 
 // Create a comment under the a Post based on PostID
-router.post('/post', function(req, res) {
+router.post('/post', auth.required, function(req, res) {
     // Post body will contain the info of the comment (provides context of comment and user info who made the comment based on comment schema)
     // {post_id : [post_id], context: String, commentedBy: [userId]}
     comment_json = {
@@ -164,6 +166,43 @@ router.post('/post', function(req, res) {
         });
     });
 
+});
+
+
+// Delete a comment given comment-id
+router.delete('/:commentId', auth.required, (req, res, next) => {
+    Comment
+    .findById(req.params.commentId)
+    .exec()
+    .then(comment => {
+        if (!comment) {
+            return res.status(404).json({
+                message: "Comment does not exist!"
+            });
+        }
+        Post
+        .findById(comment.commentPost)
+        .then(post => {
+            post.comments = post.comments.filter(id => id.toString() !== req.params.commentId);
+            post.save();
+        }).catch(err => {
+            res.status(500).json({
+                error: err
+            });
+        });
+        return comment
+		.remove()
+		.then(() => {
+			res.status(200).json({
+				message: `Delete comment ${req.params.commentId} succesfully!`
+			});
+		});
+    })
+    .catch(err => {
+		res.status(500).json({
+			error: err
+		});
+	});
 });
 
 module.exports = router;

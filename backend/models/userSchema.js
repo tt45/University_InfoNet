@@ -1,10 +1,16 @@
 // Load required packages
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+
+const {Schema} = mongoose;
 
 // Define our user schema in mongoose
 var UserSchema = new mongoose.Schema({
 	username: {type:String, required:true},
-	email: {type:String, required:true, unique:true},
+    email: {type:String, required:true, unique:true},
+    hash: String, 
+    salt: String,
     university: {type:String, required:true},
     firstName: String,
     lastName: String,
@@ -15,18 +21,34 @@ var UserSchema = new mongoose.Schema({
 }, {versionKey: false});
 
 
-
-// UserSchema.pre('save', function(next) {
-// 	var user = this;
-// 	console.log(user);
-//     userCounter.findByIdAndUpdate({_id: 'userID'}, {$inc: { seq: 1} }, function(error, userCounter) {
-//         if(error)
-//             return next(error);
-//         // user.userid = userCounter.seq;
-//         user._id = userCounter.seq;
-//         next();
-//     });
-// });
+UserSchema.methods.setPassword = function(password) {
+    this.salt = crypto.randomBytes(16).toString('hex');
+    this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');};
+  
+UserSchema.methods.validatePassword = function(password) {
+    const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+    return this.hash === hash;
+  };
+  
+UserSchema.methods.generateJWT = function() {
+    const today = new Date();
+    const expirationDate = new Date(today);
+    expirationDate.setDate(today.getDate() + 60);
+  
+    return jwt.sign({
+      email: this.email,
+      id: this._id,
+      exp: parseInt(expirationDate.getTime() / 1000, 10),
+    }, 'secret');
+}
+  
+UserSchema.methods.toAuthJSON = function() {
+    return {
+        _id: this._id,
+        email: this.email,
+        token: this.generateJWT(),
+    };
+};
 
 
 

@@ -3,9 +3,10 @@ var express = require('express'),
 	Post = require('../models/postSchema'),
 	mongoose = require('mongoose'),
 	User = require('../models/userSchema');
-	Comment = require('../models/commentSchema');
+	Comment = require('../models/commentSchema'),
+	auth = require('./auth');
 
-var fakeDB = require('../models/fakeDB'); // Used for self testing on task apis first
+
 router.use(express.json())
 
 
@@ -13,8 +14,9 @@ function appendStringParen(queryParam) {
 	return '(' + queryParam + ')';
 }
 
-// Get all lists of posts
-router.get('/', function(req, res) {
+// Get all lists of tasks (So far in our fakeDB first)
+router.get('/', auth.optional, function(req, res) {
+	// Moongoose use...
 	const query = req.query;
 	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
 	const selectParam = query.select ? eval(appendStringParen(query.select)) : {};
@@ -42,21 +44,16 @@ router.get('/', function(req, res) {
 // Or else just pass back ALL posts
 router.get('/category', function(req, res) {
 
-	const query = req.query;
-	// If not specified, then its just throwing out all posts
-	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
-	
-	Post.find(whereParam).exec()
-	.then((task) => {
-		if (task) {
-			res.status(200).send({
-				message: `OK. Post Category found.`,
-				data:task
-			});
-		} else {
-			res.status(404).send({
-				message: `Cannot Find Post of Post Category`,
-				data:[]
+
+router.get('/:postId', auth.optional, (req, res, next) => {
+	const id = req.params.postId;
+	Post
+	.findById(id)
+	.exec()
+	.then(post => {
+		if (!post) {
+			return res.status(404).json({
+				message: "Post does not exist!"
 			});
 		}
 	}).catch((error) => {
@@ -93,7 +90,7 @@ router.get('/category', function(req, res) {
 
 
 // Get certain post based on UserID   Can put queries at the end 
-router.get('/user/:id', function(req, res) {
+router.get('/user/:id', auth.required, function(req, res) {
 
 	const query = req.query;
 	// If not specified, then its just throwing out all posts created by that user...
@@ -123,7 +120,7 @@ router.get('/user/:id', function(req, res) {
 
 
 // Create new post
-router.post('/', (req, res, next) => {
+router.post('/', auth.required, (req, res, next) => {
 	const newPost = new Post({
 		_id: new mongoose.Types.ObjectId(),
 		title: req.body.title,
@@ -160,7 +157,7 @@ router.post('/', (req, res, next) => {
 	});
 });
 
-router.delete('/:postId', (req, res, next) => {
+router.delete('/:postId', auth.required, (req, res, next) => {
 	Post
 	.findById(req.params.postId)
 	.then(post => {
@@ -198,12 +195,12 @@ router.delete('/:postId', (req, res, next) => {
 
 });
 
-router.patch('/:postId', (req, res, next) => {
+router.patch('/:postId', auth.required, (req, res, next) => {
 	const id = req.params.postId;
 	const updateOps = {};
-	for (const ops of req.body) {
-		updateOps[ops.propName] = ops.value;
-	}
+    for (const ops of req.body) {
+        updateOps[ops.propName] = ops.value;
+    }
 	Post
 	.findById(id)
 	.exec()
