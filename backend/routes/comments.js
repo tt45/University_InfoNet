@@ -21,9 +21,8 @@ router.get('/', function(req, res) {
             data: comments
         });
     }).catch(err => {
-        res.status(404).send({
-            message: `No comments`,
-            data: []
+        res.status(500).send({
+            message: `Something went wrong` + err,
         });
     })
 });
@@ -73,11 +72,10 @@ router.get('/post/:post_id', function(req, res) {
 
     Post.findOne({_id: req.params.post_id}).then((post) => {
         if (!post) {
-            res.status(404).send({
+            return res.status(404).json({
                 message: `No comments made to this post_id : ${req.params.post_id}`,
                 data: []
             });
-            return;
         }
         console.log(post);
         let list_of_comments_id = post[0].comments;
@@ -85,11 +83,10 @@ router.get('/post/:post_id', function(req, res) {
         Comment.find({_id: {$in : list_of_comments_id}}).then((comments) => {
             if (comments.length == 0) {
                 
-                res.status(200).send({
+                return res.status(200).json({
                     message: `No comments made to this post_id : ${req.params.post_id}`,
                     data: []
                 });
-                return;
                 
             }
             res.status(200).send({
@@ -110,11 +107,10 @@ router.put('/:id', function(req, res) {
     // field in req.body: context
     Comment.findOne({_id: req.params.id}).exec().then(comment => {
         if (!comment) {
-            res.status(404).send({
+            return res.status(404).json({
                 message: "Comment does NOT exist!",
                 data: []
             });
-            return;
         }
         Comment.update({_id: req.params.id}, req.body, {runValidators: true})
             .exec()
