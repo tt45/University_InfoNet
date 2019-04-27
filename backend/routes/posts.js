@@ -3,7 +3,8 @@ var express = require('express'),
 	Post = require('../models/postSchema'),
 	mongoose = require('mongoose'),
 	User = require('../models/userSchema');
-	Comment = require('../models/commentSchema');
+	Comment = require('../models/commentSchema'),
+	auth = require('./auth');
 
 var fakeDB = require('../models/fakeDB'); // Used for self testing on task apis first
 router.use(express.json())
@@ -71,7 +72,7 @@ router.get('/:postId', (req, res, next) => {
 
 
 // Get certain post based on UserID   Can put queries at the end 
-router.get('/user/:id', function(req, res) {
+router.get('/user/:id', auth.required, function(req, res) {
 
 	const query = req.query;
 	// If not specified, then its just throwing out all posts created by that user...
@@ -102,7 +103,7 @@ router.get('/user/:id', function(req, res) {
 
 
 // Create new post
-router.post('/', (req, res, next) => {
+router.post('/', auth.required, (req, res, next) => {
 	const newPost = new Post({
 		_id: new mongoose.Types.ObjectId(),
 		title: req.body.title,
@@ -139,7 +140,7 @@ router.post('/', (req, res, next) => {
 	});
 });
 
-router.delete('/:postId', (req, res, next) => {
+router.delete('/:postId', auth.required, (req, res, next) => {
 	Post
 	.findById(req.params.postId)
 	.then(post => {
@@ -177,7 +178,7 @@ router.delete('/:postId', (req, res, next) => {
 
 });
 
-router.patch('/:postId', (req, res, next) => {
+router.patch('/:postId', auth.required, (req, res, next) => {
 	const id = req.params.postId;
 	const updateOps = {};
 	for (const ops of req.body) {

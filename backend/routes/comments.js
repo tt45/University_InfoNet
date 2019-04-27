@@ -49,7 +49,7 @@ router.get('/:id', function(req, res) {
 });
 
 // Get all comments commented by user based on user_id
-router.get('/user/:user_id', function(req, res) {
+router.get('/user/:user_id', auth.required, function(req, res) {
 
     Comment.find({commentedBy: req.params.user_id}).then((comments) => {
         res.status(200).send({

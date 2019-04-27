@@ -1,19 +1,13 @@
 var express = require('express'),
 	router = express.Router(),
 	User = require('../models/userSchema');
-mongoose = require('mongoose');
-
-Post = require('../models/postSchema');
-
-var fakeDB = require('../models/fakeDB'); // Used for self testing on user apis first
-router.use(express.json())
+	mongoose = require('mongoose'),
+	Post = require('../models/postSchema'),
+	auth = require('./auth'),
+	passport = require('passport');
 
 
-
-function appendStringParen(queryParam) {
-	return '(' + queryParam + ')';
-}
-
+router.use(express.json());
 
 // Get all lists of users (So far in our fakeDB first)
 router.get('/', function(req, res) {
@@ -41,8 +35,82 @@ router.get('/', function(req, res) {
 	});
 });
 
+
+
+//POST new user route (optional, everyone has access)
+router.post('/signup', auth.optional, (req, res, next) => {
+	const { body: { user } } = req;
+  
+	if(!user.email) {
+	  return res.status(422).json({
+		errors: {
+		  email: 'is required',
+		},
+	  });
+	}
+  
+	if(!user.password) {
+	  return res.status(422).json({
+		errors: {
+		  password: 'is required',
+		},
+	  });
+	}
+  
+	const finalUser = new User(user);
+  
+	finalUser.setPassword(user.password);
+  
+	return finalUser.save()
+	  .then(() => res.json({ user: finalUser.toAuthJSON() }));
+  });
+  
+  //POST login route (optional, everyone has access)
+  router.post('/login', auth.optional, (req, res, next) => {
+	const { body: { user } } = req;
+  
+	if(!user.email) {
+	  return res.status(422).json({
+		errors: {
+		  email: 'is required',
+		},
+	  });
+	}
+  
+	if(!user.password) {
+	  return res.status(422).json({
+		errors: {
+		  password: 'is required',
+		},
+	  });
+	}
+  
+	return passport.authenticate('local', { session: false }, (err, passportUser, info) => {
+	  if(err) {
+		return next(err);
+	  }
+  
+	  if(passportUser) {
+		const user = passportUser;
+		user.token = passportUser.generateJWT();
+  
+		return res.json({ 
+			user: user.toAuthJSON()
+		});
+	  }
+  
+	  return status(400).info;
+	})(req, res, next);
+  });
+
+function appendStringParen(queryParam) {
+	return '(' + queryParam + ')';
+}
+
+
+
 // Get certain user based on user ID
-router.get('/:id', function(req, res) {
+router.get('/:id', auth.required, function(req, res) {
 	User.findOne({_id: req.params.id}).exec()
 	.then((user) => {
 		if (user) {
