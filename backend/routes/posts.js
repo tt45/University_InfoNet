@@ -6,7 +6,7 @@ var express = require('express'),
 	Comment = require('../models/commentSchema'),
 	auth = require('./auth');
 
-var fakeDB = require('../models/fakeDB'); // Used for self testing on task apis first
+
 router.use(express.json())
 
 
@@ -15,7 +15,7 @@ function appendStringParen(queryParam) {
 }
 
 // Get all lists of tasks (So far in our fakeDB first)
-router.get('/', function(req, res) {
+router.get('/', auth.optional, function(req, res) {
 	// Moongoose use...
 	const query = req.query;
 	console.log(req.query);
@@ -47,7 +47,7 @@ router.get('/', function(req, res) {
 });
 
 
-router.get('/:postId', (req, res, next) => {
+router.get('/:postId', auth.optional, (req, res, next) => {
 	const id = req.params.postId;
 	Post
 	.findById(id)
