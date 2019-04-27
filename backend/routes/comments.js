@@ -32,27 +32,18 @@ router.get('/', function(req, res) {
 router.get('/:id', function(req, res) {
 
     Comment.findOne({_id: req.params.id}).then((comments) => {
-<<<<<<< HEAD
-=======
         if (!comments) {
             return res.status(404).json({
                 message: "Comment does not exist!"
             });
         }
->>>>>>> Yidan
         res.status(200).send({
             message: `Comment with ID: ${req.params.id} Found!`,
             data: comments
         });
     }).catch(err => {
-<<<<<<< HEAD
-        res.status(404).send({
-            message: `No comment of ID : ${req.params.id}`,
-            data: []
-=======
         res.status(500).send({
             error: err
->>>>>>> Yidan
         });
     })
 });
@@ -60,15 +51,19 @@ router.get('/:id', function(req, res) {
 // Get all comments commented by user based on user_id
 router.get('/user/:user_id', function(req, res) {
 
-    Comment.find({commentedBy: req.params.user_id}).then((comments) => {
+    Comment.findOne({commentedBy: req.params.user_id}).then((comments) => {
+        if (!comments) {
+            return res.status(404).json({
+                message: "Comment does not exist!"
+            });
+        }
         res.status(200).send({
             message: `Comments commented by ${req.params.user_id} user_id.`,
             data: comments
         });
     }).catch(err => {
-        res.status(404).send({
-            message: `No comments made by this user_id : ${req.params.user_id}`,
-            data: []
+        res.status(500).send({
+            error: err
         });
     })
 });
@@ -76,19 +71,35 @@ router.get('/user/:user_id', function(req, res) {
 // Find All comments for certain post based on post_id
 router.get('/post/:post_id', function(req, res) {
 
-    Post.find({_id: req.params.post_id}).then((post) => {
+    Post.findOne({_id: req.params.post_id}).then((post) => {
+        if (!post) {
+            res.status(404).send({
+                message: `No comments made to this post_id : ${req.params.post_id}`,
+                data: []
+            });
+            return;
+        }
         console.log(post);
         let list_of_comments_id = post[0].comments;
         console.log(list_of_comments_id);
         Comment.find({_id: {$in : list_of_comments_id}}).then((comments) => {
+            if (comments.length == 0) {
+                
+                res.status(200).send({
+                    message: `No comments made to this post_id : ${req.params.post_id}`,
+                    data: []
+                });
+                return;
+                
+            }
             res.status(200).send({
                 message: `Comments commented to PostID ${req.params.post_id}.` ,
                 data: comments
             });
         })
     }).catch(err => {
-        res.status(404).send({
-            message: `No comments made to this post_id : ${req.params.post_id}`,
+        res.status(500).send({
+            message: `Error:` + err,
             data: []
         });
     })
@@ -97,8 +108,8 @@ router.get('/post/:post_id', function(req, res) {
 // Udate comment based on commentID
 router.put('/:id', function(req, res) {
     // field in req.body: context
-    Comment.find({_id: req.params.id}).exec().then(comment => {
-        if (comment.length == 0) {
+    Comment.findOne({_id: req.params.id}).exec().then(comment => {
+        if (!comment) {
             res.status(404).send({
                 message: "Comment does NOT exist!",
                 data: []
