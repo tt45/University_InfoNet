@@ -18,6 +18,12 @@ function appendStringParen(queryParam) {
 router.get('/', auth.optional, function(req, res) {
 	// Moongoose use...
 	const query = req.query;
+	console.log(req.query);
+	console.log("(" + req.query.where + ")");
+	console.log(req.query.sort);
+	console.log(req.query.select);
+	console.log(req.query.skip);
+	console.log(req.query.limit);
 	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
 	const selectParam = query.select ? eval(appendStringParen(query.select)) : {};
 	const sortParam = query.sort ? eval(appendStringParen(query.sort)) : {};
@@ -40,10 +46,6 @@ router.get('/', auth.optional, function(req, res) {
 		});
 });
 
-// Used to get posts based on the clicked category. MUST HAVE  ?where={"category":[categoryTypeString]}  QUERY!
-// Or else just pass back ALL posts
-router.get('/category', function(req, res) {
-
 
 router.get('/:postId', auth.optional, (req, res, next) => {
 	const id = req.params.postId;
@@ -56,37 +58,17 @@ router.get('/:postId', auth.optional, (req, res, next) => {
 				message: "Post does not exist!"
 			});
 		}
-	}).catch((error) => {
-		res.status(500).send({
-			message: `Server Error: ${error.name}: Cast to number failed for value '${error.value}' at path '${error.path}' for model 'Post' `,
-			data:[]
-		})
+		res.status(200).json({
+			message: "Find Post!",
+			data: post
+		});
+	})
+	.catch(err => {
+		res.status(500).json({
+			error: err
+		});
 	});
-})
-
-
-// router.get('/:postId', (req, res, next) => {
-// 	const id = req.params.postId;
-// 	Post
-// 	.findById(id)
-// 	.exec()
-// 	.then(post => {
-// 		if (!post) {
-// 			return res.status(404).json({
-// 				message: "Post does not exist!"
-// 			});
-// 		}
-// 		res.status(200).json({
-// 			message: "Find Post!",
-// 			data: post
-// 		});
-// 	})
-// 	.catch(err => {
-// 		res.status(500).json({
-// 			error: err
-// 		});
-// 	});
-// });
+});
 
 
 // Get certain post based on UserID   Can put queries at the end 
@@ -111,6 +93,7 @@ router.get('/user/:id', auth.required, function(req, res) {
 			});
 		}
 	}).catch((error) => {
+		console.log(error);
 		res.status(500).send({
 			message: `Server Error: ${error.name}: Cast to number failed for value '${error.value}' at path '${error.path}' for model 'Post' `,
 			data:[]
