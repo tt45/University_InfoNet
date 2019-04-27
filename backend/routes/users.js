@@ -1,7 +1,7 @@
 var express = require('express'),
 	router = express.Router(),
 	User = require('../models/userSchema');
-	mongoose = require('mongoose'),
+	mongoose = require('mongoose');
 	Post = require('../models/postSchema'),
 	auth = require('./auth'),
 	passport = require('passport');
@@ -36,52 +36,82 @@ router.get('/', function(req, res) {
 });
 
 
-
 //POST new user route (optional, everyone has access)
 router.post('/signup', auth.optional, (req, res, next) => {
-	const { body: { user } } = req;
-  
-	if(!user.email) {
-	  return res.status(422).json({
-		errors: {
-		  email: 'is required',
-		},
-	  });
+
+	if (!req.body.email) {
+		return res.status(422).json({
+			message: "Email is required!"
+		});
 	}
-  
-	if(!user.password) {
-	  return res.status(422).json({
-		errors: {
-		  password: 'is required',
-		},
-	  });
+
+	if (!req.body.username) {
+		return res.status(422).json({
+			message: "Username is required!"
+		});
 	}
+
+	if (!req.body.password) {
+		return res.status(422).json({
+			message: "Password is required!"
+		});
+	}
+
+	if (!req.body.university) {
+		return res.status(422).json({
+			message: "University is required!"
+		});
+	}
+
+	User
+	.findOne({email: req.body.email})
+	.exec()
+	.then(user => {
+		if (user) {
+			return res.status(409).json({
+				message: "Email exists!"
+			});
+		}
+		console.log("Whats the fuck!");
+		const finalUser = new User({
+			_id: new mongoose.Types.ObjectId(),
+			email: req.body.email,
+			username: req.body.username,
+			university: req.body.university,
+			firstName: req.body.firstName,
+			lastName: req.body.lastName,
+			major: req.body.major,
+			year: req.body.year,
+			expectedGraduation: req.body.expectedGraduation,
+		});
   
-	const finalUser = new User(user);
-  
-	finalUser.setPassword(user.password);
-  
-	return finalUser.save()
-	  .then(() => res.json({ user: finalUser.toAuthJSON() }));
+		console.log("finalUser", finalUser);
+		finalUser.setPassword(req.body.password);
+	  
+		console.log("finalUser", finalUser);
+		return finalUser.save()
+		  .then(() => res.json({ user: finalUser.toAuthJSON() }));
+
+	})
+	.catch(err => {
+		res.status(500).json({
+			error: err
+		});
+	});
   });
   
   //POST login route (optional, everyone has access)
   router.post('/login', auth.optional, (req, res, next) => {
-	const { body: { user } } = req;
   
-	if(!user.email) {
+	if(!req.body.email) {
 	  return res.status(422).json({
-		errors: {
-		  email: 'is required',
-		},
+		message: "email is required"
 	  });
 	}
   
-	if(!user.password) {
+	if(!req.body.password) {
 	  return res.status(422).json({
-		errors: {
-		  password: 'is required',
-		},
+		message: "password is required"
 	  });
 	}
   
@@ -98,10 +128,13 @@ router.post('/signup', auth.optional, (req, res, next) => {
 			user: user.toAuthJSON()
 		});
 	  }
-  
-	  return status(400).info;
-	})(req, res, next);
+	  
+	  return res.json({
+		  error: "Email or password does not match"
+	  });
+	})(req, res, next)
   });
+
 
 function appendStringParen(queryParam) {
 	return '(' + queryParam + ')';

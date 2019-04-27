@@ -181,9 +181,9 @@ router.delete('/:postId', auth.required, (req, res, next) => {
 router.patch('/:postId', auth.required, (req, res, next) => {
 	const id = req.params.postId;
 	const updateOps = {};
-	for (const ops of req.body) {
-		updateOps[ops.propName] = ops.value;
-	}
+    for (const ops of req.body) {
+        updateOps[ops.propName] = ops.value;
+    }
 	Post
 	.findById(id)
 	.exec()
