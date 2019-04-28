@@ -15,8 +15,10 @@ class PostDetail extends Component {
         }
 
         render() {
-                const {post, user} = this.props;
+                const {post, user, comments} = this.props;
+                console.log(comments, 'post comments')
                 return (
+                        <div className='postDetail'>
                         <Card>
                           <Card.Header>{post.title}</Card.Header>
                           <Card.Body>
@@ -38,6 +40,9 @@ class PostDetail extends Component {
                             </div>
                           </Card.Body>
                         </Card>
+                        {comments.map((comment) =>
+                                <p>{comment.context}</p>)}
+                        </div>
                 )
         }
 }
@@ -46,7 +51,8 @@ function mapStateToProps(state) {
         console.log(state);
         return {
                 post: state.detailReducer.post,
-                user: state.userReducer.user
+                user: state.userReducer.user,
+                comments: state.detailReducer.comments,
         }
 }
 

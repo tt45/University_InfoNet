@@ -1,5 +1,6 @@
 const initialState = {
         post: {},
+        comments: [],
 }
 
 function detailReducer(state = initialState, action) {
@@ -9,7 +10,8 @@ function detailReducer(state = initialState, action) {
                 case "FETCH_POST_ERROR":
 
                         return state;
-
+                case "FETCH_POST_COMMENT":
+                        return {...state, comments: action.payload.comments}
                 default:
                         return state;
         }

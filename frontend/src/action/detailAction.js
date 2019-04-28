@@ -17,25 +17,28 @@ export function fetchPost(post_id) {
 }
 
 export function fetchPostComment(comment_arr) {
-        var comment_objects = [];
+        //var comment_objects = [];
         return dispatch => {
-                console.log('fetch comments with post')
                 Promise.all(
                         comment_arr.map(comment_id=>
                                 axios.get("http://127.0.0.1:4000/comments/"+comment_id)
                                 .then(function(response) {
-                                        console.log(response)
+                                        return response.data
                                 })
                                 .catch(function(err) {
                                         console.log(err);
                                 })
                         )
                 ).then(responses =>
-                        console.log(responses)
-
-                ).catch()
+                        dispatch(fetchPostCommentSuccess(responses))
+                ).catch(err => console.log(err))
         }
 }
+
+export const fetchPostCommentSuccess = comments => ({
+        type: "FETCH_POST_COMMENT",
+        payload: {comments}
+})
 
 export const fetchPostSuccess = post => ({
         type: "FETCH_POST_SUCCESS",
