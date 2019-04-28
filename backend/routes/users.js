@@ -1,21 +1,15 @@
 var express = require('express'),
 	router = express.Router(),
 	User = require('../models/userSchema');
-mongoose = require('mongoose');
-
-Post = require('../models/postSchema');
-
-var fakeDB = require('../models/fakeDB'); // Used for self testing on user apis first
-router.use(express.json())
+	mongoose = require('mongoose');
+	Post = require('../models/postSchema'),
+	auth = require('./auth'),
+	passport = require('passport');
 
 
+router.use(express.json());
 
-function appendStringParen(queryParam) {
-	return '(' + queryParam + ')';
-}
-
-
-// Get all lists of users (So far in our fakeDB first)
+// Get all lists of users (So far in our fakeDB first)  ? Add in where={university:value} to get users based on University
 router.get('/', function(req, res) {
 	const query = req.query;
 
@@ -30,7 +24,7 @@ router.get('/', function(req, res) {
 	.exec()
 	.then((users_list) => {
 		res.status(200).send({
-			message: countTrue ? "OK. Returned total count of retrieved data." : "OK. List of Users. Wha?",
+			message: countTrue ? "OK. Returned total count of retrieved data." : "OK. List of Users.",
 			data: countTrue ? users_list.length : users_list
 		});
 	}).catch((err) => {
@@ -41,8 +35,116 @@ router.get('/', function(req, res) {
 	});
 });
 
+
+
+//POST new user route (optional, everyone has access)
+router.post('/signup', auth.optional, (req, res, next) => {
+
+	if (!req.body.email) {
+		return res.status(422).json({
+			message: "Email is required!"
+		});
+	}
+
+	if (!req.body.username) {
+		return res.status(422).json({
+			message: "Username is required!"
+		});
+	}
+
+	if (!req.body.password) {
+		return res.status(422).json({
+			message: "Password is required!"
+		});
+	}
+
+	if (!req.body.university) {
+		return res.status(422).json({
+			message: "University is required!"
+		});
+	}
+
+	User
+	.findOne({email: req.body.email})
+	.exec()
+	.then(user => {
+		if (user) {
+			return res.status(409).json({
+				message: "Email exists!"
+			});
+		}
+		console.log("Whats the fuck!");
+		const finalUser = new User({
+			_id: new mongoose.Types.ObjectId(),
+			email: req.body.email,
+			username: req.body.username,
+			university: req.body.university,
+			firstName: req.body.firstName,
+			lastName: req.body.lastName,
+			major: req.body.major,
+			year: req.body.year,
+			expectedGraduation: req.body.expectedGraduation,
+		});
+  
+		console.log("finalUser", finalUser);
+		finalUser.setPassword(req.body.password);
+	  
+		console.log("finalUser", finalUser);
+		return finalUser.save()
+		  .then(() => res.json({ user: finalUser.toAuthJSON() }));
+
+	})
+	.catch(err => {
+		res.status(500).json({
+			error: err
+		});
+	});
+  });
+  
+  //POST login route (optional, everyone has access)
+  router.post('/login', auth.optional, (req, res, next) => {
+  
+	if(!req.body.email) {
+	  return res.status(422).json({
+		message: "email is required"
+	  });
+	}
+  
+	if(!req.body.password) {
+	  return res.status(422).json({
+		message: "password is required"
+	  });
+	}
+  
+	return passport.authenticate('local', { session: false }, (err, passportUser, info) => {
+	  if(err) {
+		return next(err);
+	  }
+  
+	  if(passportUser) {
+		const user = passportUser;
+		user.token = passportUser.generateJWT();
+  
+		return res.json({ 
+			user: user.toAuthJSON()
+		});
+	  }
+	  
+	  return res.json({
+		  error: "Email or password does not match"
+	  });
+	})(req, res, next)
+  });
+
+
+function appendStringParen(queryParam) {
+	return '(' + queryParam + ')';
+}
+
+
+
 // Get certain user based on user ID
-router.get('/:id', function(req, res) {
+router.get('/:id', auth.required, function(req, res) {
 	User.findOne({_id: req.params.id}).exec()
 	.then((user) => {
 		if (user) {

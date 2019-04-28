@@ -3,8 +3,10 @@ var express = require('express'),
 	Post = require('../models/postSchema'),
 	mongoose = require('mongoose'),
 	User = require('../models/userSchema');
+	Comment = require('../models/commentSchema'),
+	auth = require('./auth');
 
-var fakeDB = require('../models/fakeDB'); // Used for self testing on task apis first
+
 router.use(express.json())
 
 
@@ -13,7 +15,7 @@ function appendStringParen(queryParam) {
 }
 
 // Get all lists of tasks (So far in our fakeDB first)
-router.get('/', function(req, res) {
+router.get('/', auth.optional, function(req, res) {
 	// Moongoose use...
 	const query = req.query;
 	console.log(req.query);
@@ -45,9 +47,39 @@ router.get('/', function(req, res) {
 });
 
 
-// Get certain task based on task ID
-router.get('/:id', function(req, res) {
-	Post.findOne({_id: req.params.id}).exec()
+router.get('/:postId', auth.optional, (req, res, next) => {
+	const id = req.params.postId;
+	Post
+	.findById(id)
+	.exec()
+	.then(post => {
+		if (!post) {
+			return res.status(404).json({
+				message: "Post does not exist!"
+			});
+		}
+		res.status(200).json({
+			message: "Find Post!",
+			data: post
+		});
+	})
+	.catch(err => {
+		res.status(500).json({
+			error: err
+		});
+	});
+});
+
+
+// Get certain post based on UserID   Can put queries at the end 
+router.get('/user/:id', auth.required, function(req, res) {
+
+	const query = req.query;
+	// If not specified, then its just throwing out all posts created by that user...
+	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
+	whereParam.postedBy = req.params.id;
+	
+	Post.findOne(whereParam).exec()
 	.then((task) => {
 		if (task) {
 			res.status(200).send({
@@ -67,39 +99,118 @@ router.get('/:id', function(req, res) {
 			data:[]
 		})
 	});
-})
+});
 
 
-// // Delete for task/:id
-// router.delete('/:id', function(req, res) {
-// 	tasks.findById({_id: req.params.id}).exec(
-// 		).then((result) => {
-// 			if (result) {
-// 				User.update({_id: String(result.assignedUser)}, { $pull: { pendingTasks: String(result._id) }}).exec()
-// 				.then((result) => {
-// 					tasks.deleteOne({_id: String(req.params.id)}).exec()
-// 					.then((result => {
-// 						res.status(200).send({
-// 							message: "OK. Operation Successful.",
-// 							data: []
-// 						});
-// 					}))
-// 				})
-// 				.catch(err => {
-// 					return err;
-// 				})
-// 			} else {
-// 				res.status(404).send({
-// 					message: "Cannot Find Object for deletion.",
-// 					data: []
-// 				});
-// 			}
-// 		}).catch((error) => {
-// 			res.status(400).send({
-// 				message: `Bad Request. Error : ${error}`
-// 			});	
-// 		});
-// });
+// Create new post
+router.post('/', auth.required, (req, res, next) => {
+	const newPost = new Post({
+		_id: new mongoose.Types.ObjectId(),
+		title: req.body.title,
+		context: req.body.context,
+		likeCount: req.body.likeCount,
+		createdTime: req.body.createdTime,
+		university: req.body.university,
+		comments: req.body.comments,
+		postedBy: req.body.postedBy,
+		category: req.body.category
+	});
+	newPost
+	.save()
+	.then(result => {
+		res.status(201).json({
+			message: "Create Post succesfully",
+			createdPost: {
+				_id: newPost._id,
+				title: newPost.title,
+				context: newPost.context,
+				likeCount: newPost.likeCount,
+				createdTime: newPost.createdTime,
+				university: newPost.university,
+				comments: newPost.comments,
+				postedBy: newPost.postedBy,
+				category: newPost.category
+			}
+		});
+	})
+	.catch(err => {
+		res.status(500).json({
+			error: err
+		});
+	});
+});
+
+router.delete('/:postId', auth.required, (req, res, next) => {
+	Post
+	.findById(req.params.postId)
+	.then(post => {
+		if (!post) {
+			return res.status(404).json({
+				message: "Provided postId does not exist"
+			});
+		}
+		if (post.comments.length > 0) {
+			post.comments.map(id => {
+				Comment.remove({
+					_id: id
+				})
+				.exec()
+				.catch(err => {
+					res.status(500).json({
+						error: err
+					});
+				});
+			});
+		} 
+		return post
+		.remove()
+		.then(result => {
+			res.status(200).json({
+				message: `Delete post ${req.params.postId} succesfully!`
+			});
+		});
+	})
+	.catch(err => {
+		res.status(500).json({
+			error: err
+		});
+	});
+
+});
+
+router.patch('/:postId', auth.required, (req, res, next) => {
+	const id = req.params.postId;
+	const updateOps = {};
+    for (const ops of req.body) {
+        updateOps[ops.propName] = ops.value;
+    }
+	Post
+	.findById(id)
+	.exec()
+	.then(post => {
+		if (!post) {
+			return res.status(500).json({
+				message: "Post does not exist!"
+			});
+		}
+		Post
+		.update({_id: id
+		}, {
+			$set: updateOps
+		})
+		.exec()
+		.then(result => {	
+			res.status(200).json({
+				message: "Update Post Successfully!",
+				result: result
+			})
+		});
+	}).catch(err => {
+    	res.status(500).json({
+            error: err
+        });
+    });
+});
 
 
 
