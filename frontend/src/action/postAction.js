@@ -15,6 +15,24 @@ export function fetchPosts() {
   };
 }
 
+export function createPost(user_id, title, category, context) {
+        return dispatch => {
+                return axios.post("http://127.0.0.1:4000/posts", {
+                                userId: user_id,
+                                title: title,
+                                category: category,
+                                context: context,
+                        })
+                        .then(function (response) {
+                                console.log(response)
+                                dispatch(fetchPosts())
+                        })
+                        .catch(function (err) {
+                                console.log(err);
+                        })
+        }
+}
+
 export const fetchPostsSuccess = posts => ({
         type: "FETCH_POSTS_SUCCESS",
         payload: { posts }

@@ -64,14 +64,14 @@ function mapStateToProps(state) {
         const {posts, filter_category, search_input} = state.postReducer;
         const display_post = filter_category===''?posts:posts.filter((post)=>post.category===filter_category);
         return {
-                posts: search_input===''?display_post:display_post.filter(post=>post.title.includes(search_input)),
+                posts: search_input===''?display_post:display_post.filter(post=>post.title.toLowerCase().includes(search_input.toLowerCase())),
         }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    filterPosts: (category) => {dispatch(filterPosts(category))}
-  };
-}
+// function mapDispatchToProps(dispatch) {
+//   return {
+//     filterPosts: (category) => {dispatch(filterPosts(category))}
+//   };
+// }
 
 export default connect(mapStateToProps)(Home);

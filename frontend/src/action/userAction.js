@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export function fetchUser() {
   return dispatch => {
-    return axios.get("http://127.0.0.1:4000/users/5cbf760b1c9d4400006d060d", {
+    return axios.get("http://127.0.0.1:4000/users/5cc52a5d6a1223f5130504d9", {
 
     })
       .then(function (response) {

@@ -3,7 +3,7 @@ import {Card, Badge, Form, Button} from 'react-bootstrap';
 import { connect } from "react-redux";
 import { FaThumbsUp } from "react-icons/fa";
 
-import {fetchPost, fetchPostComment, submitCommentToPost} from '../action/detailAction'
+import {fetchPost, submitCommentToPost} from '../action/detailAction'
 import './PostDetail.scss'
 
 class PostDetail extends Component {
@@ -23,9 +23,8 @@ class PostDetail extends Component {
 
 
         handleSubmit() {
-                console.log(this.state.input)
-                console.log( this.props.post.postedBy, this.props.post._id)
-                this.props.dispatch(submitCommentToPost(this.state.input, this.props.post.postedBy, this.props.post._id));
+                this.inputContext.value = "";
+                this.props.dispatch(submitCommentToPost(this.state.input, this.props.user._id, this.props.post._id));
         }
 
         async componentDidMount() {
@@ -70,7 +69,7 @@ class PostDetail extends Component {
                                   <div className="comment_section">
                                           <Form.Group controlId="exampleForm.ControlTextarea1">
                                             <Form.Label>Comment:</Form.Label>
-                                            <Form.Control as="textarea" rows="3" onChange={this.inputChange}/>
+                                            <Form.Control ref={el => this.inputContext = el} as="textarea" rows="3" onChange={this.inputChange}/>
                                           </Form.Group>
                                           <Button className="submit_comment" as="input" type="submit" value="Submit" onClick={this.handleSubmit}/>
                                   </div>
@@ -84,6 +83,7 @@ function mapStateToProps(state) {
         return {
                 post: state.detailReducer.post,
                 comments: state.detailReducer.comments,
+                user: state.userReducer.user,
         }
 }
 

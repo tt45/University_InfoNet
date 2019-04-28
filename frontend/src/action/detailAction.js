@@ -28,19 +28,13 @@ export function submitCommentToPost(input, user_id, post_id) {
                         commentedBy: [user_id],
                 })
                 .then(function (response){
-                        console.log(response)
-
+                        dispatch(fetchPost(post_id));
                 })
                 .catch(function (err) {
                         console.log(err);
                 })
         }
 }
-
-export const submitCommentToPostSuccess = () => ({
-        type: "SUBMIT_COMMENT_TO_POST_SUCCESS",
-
-})
 
 export const fetchPostSuccess = (post, comments) => ({
         type: "FETCH_POST_SUCCESS",
