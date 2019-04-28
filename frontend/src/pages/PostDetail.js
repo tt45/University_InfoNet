@@ -46,7 +46,7 @@ class PostDetail extends Component {
                                         {post.context}{' '}
                                       </p>
                                       <footer className="blockquote-footer">
-                                        {post.postedBy}
+                                        {post.postedByUserName}
                                       </footer>
                                     </blockquote>
                                     <div className='other_info'>
@@ -60,7 +60,7 @@ class PostDetail extends Component {
                                 </Card>
                                 {comments.map(comment =>
                                   <Card key={comment._id} border="info">
-                                    <Card.Header className="CommentHeader">Commented By: {comment.commentedBy}</Card.Header>
+                                    <Card.Header className="CommentHeader">Commented By: </Card.Header>
                                     <Card.Body>
                                       <Card.Text>
                                         {comment.context}
