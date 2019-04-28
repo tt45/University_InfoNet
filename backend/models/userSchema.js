@@ -17,7 +17,13 @@ var UserSchema = new mongoose.Schema({
     major: String,
     year: Number,
     expectedGraduation: Date,
-	dateCreated: {type:Date, default:Date.now}
+	dateCreated: {type:Date, default:Date.now},
+    likes: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Post'
+        }
+    ]
 }, {versionKey: false});
 
 
