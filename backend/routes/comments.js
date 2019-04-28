@@ -10,7 +10,7 @@ router.use(express.json());
 
 
 router.get('/', function(req, res) {
-
+    console.log(req.body);
     Comment.find({}).then((comments) => {
         if (comments.length === 0) {
             return res.status(404).json({

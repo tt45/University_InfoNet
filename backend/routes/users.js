@@ -120,11 +120,9 @@ router.post('/signup', auth.optional, (req, res, next) => {
 	  if(err) {
 		return next(err);
 	  }
-  
 	  if(passportUser) {
 		const user = passportUser;
 		user.token = passportUser.generateJWT();
-  
 		return res.json({ 
 			user: user.toAuthJSON()
 		});
@@ -144,9 +142,9 @@ function appendStringParen(queryParam) {
 
 
 // Get certain user based on user ID
-router.get('/:id', auth.optional, function(req, res) {
-
-	console.log("OVerHERE\n++++++++++++" + req);
+router.get('/:id', auth.required, function(req, res) {
+	// console.log(req.payload);
+	// console.log(req.headers);
 	User.findOne({_id: req.params.id}).exec()
 	.then((user) => {
 		if (user) {
