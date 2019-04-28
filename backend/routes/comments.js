@@ -149,7 +149,7 @@ router.post('/post', auth.optional, function(req, res) {
     console.log(new_comment);
     new_comment.save().then((created_comment) => {
         // Update the new comment ID into the Post referenced "comments" array
-        Post.update({_id: req.body.post_id}, {$push: {comments: created_comment._id} }).exec()
+        Post.update({_id: req.body.postId}, {$push: {comments: created_comment._id} }).exec()
             .then(updated_post => {
                 res.status(200).send({
                     message: `Created comment for postID: ${req.body.postId}`,
