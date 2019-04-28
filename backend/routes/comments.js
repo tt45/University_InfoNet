@@ -80,8 +80,8 @@ router.get('/post/:post_id', function(req, res) {
         }
         // console.log(post);
         let list_of_comments_id = post.comments;
-        // console.log(list_of_comments_id); // Populate it
-        Comment.find({_id: {$in : list_of_comments_id}}).populate('commentedBy')
+        // console.log(list_of_comments_id); // 
+        Comment.find({_id: {$in : list_of_comments_id}})
         .then((comments) => {
             if (comments.length == 0) {
                 
@@ -141,28 +141,32 @@ router.put('/:id', auth.optional, function(req, res) {
 router.post('/post', auth.optional, function(req, res) {
     // Post body will contain the info of the comment (provides context of comment and user info who made the comment based on comment schema)
     // {postId : [postId], context: String, commentedBy: [userId]}
-    comment_json = {
-        context: req.body.context,
-        commentedBy: req.body.commentedBy,
-        commentPost: req.body.postId
-    }
-    console.log(req.body.commentPost);
-    let new_comment = new Comment(comment_json);
-    console.log(new_comment);
-    new_comment.save().then((created_comment) => {
-        // Update the new comment ID into the Post referenced "comments" array
-        Post.update({_id: req.body.postId}, {$push: {comments: created_comment._id} }).exec()
-            .then(updated_post => {
-                res.status(200).send({
-                    message: `Created comment for postID: ${req.body.postId}`,
-                    data: updated_post
-                });
-            })
-            .catch(err => {
-                res.status(500).send({
-                    message: "Oops! Something went wrong! Err: " + err,
-                    data: []
-                });
+
+    User.findById(req.body.commentedBy).exec()
+        .then(user => {
+            comment_json = {
+                context: req.body.context,
+                commentedBy: req.body.commentedBy,
+                commentPost: req.body.postId,
+                commentedByUserName: user.username
+            }
+            let new_comment = new Comment(comment_json);
+            console.log(new_comment);
+            new_comment.save().then((created_comment) => {
+                // Update the new comment ID into the Post referenced "comments" array
+                Post.update({_id: req.body.postId}, {$push: {comments: created_comment._id} }).exec()
+                    .then(updated_post => {
+                        res.status(200).send({
+                            message: `Created comment for postID: ${req.body.postId}`,
+                            data: updated_post
+                        });
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            message: "Oops! Something went wrong! Err: " + err,
+                            data: []
+                        });
+                    })
             })
     }).catch(err => {
         res.status(500).send({

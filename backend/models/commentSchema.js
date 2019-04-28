@@ -15,7 +15,8 @@ var commentSchema = new mongoose.Schema({
 	commentPost: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Post'
-	}
+	},
+	commentedByUserName: String // New added
 });
 
 module.exports = mongoose.model("Comment", commentSchema);
