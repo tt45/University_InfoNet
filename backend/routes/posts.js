@@ -14,7 +14,7 @@ function appendStringParen(queryParam) {
 	return '(' + queryParam + ')';
 }
 
-// Get all lists of tasks (So far in our fakeDB first)
+// Get every post there is (For certain category & University???? <- Still needs logic implementation and design)
 router.get('/', auth.optional, function(req, res) {
 	// Moongoose use...
 	const query = req.query;
@@ -31,7 +31,7 @@ router.get('/', auth.optional, function(req, res) {
 	const limitParam = query.limit ? eval(appendStringParen(query.limit)) : 0;
 	const countTrue = query.count ? eval(query.count) : false;
 
-	Post.find(whereParam).select(selectParam).sort(sortParam).skip(skipParam).limit(limitParam)
+	Post.find(whereParam).select(selectParam).sort(sortParam).skip(skipParam).limit(limitParam).populate('postedBy')
 		.exec()
 		.then((tasks_list) => {
 			res.status(200).send({
@@ -51,7 +51,7 @@ router.get('/:postId', auth.optional, (req, res, next) => {
 	// console.log(req.headers);
 	const id = req.params.postId;
 	Post
-	.findById(id)
+	.findById(id).populate('postedBy')
 	.exec()
 	.then(post => {
 		if (!post) {
