@@ -114,7 +114,7 @@ router.get('/user/:id', auth.optional, function(req, res) {
 });
 
 
-// Create new post // { postedBy: [userID] , university: [university Name], category: [category]} 
+// Create new post // { postedBy: [userID], category: [category]} 
 // will be passed within the req.body
 router.post('/', auth.optional, (req, res, next) => {
 
@@ -125,7 +125,7 @@ router.post('/', auth.optional, (req, res, next) => {
 			context: req.body.context,
 			// likeCount: req.body.likeCount,
 			// createdTime: req.body.createdTime,
-			university: req.body.university,
+			university: user.university,
 			// comments: req.body.comments,
 			postedBy: req.body.postedBy,
 			category: req.body.category,
@@ -234,7 +234,24 @@ router.patch('/:postId', auth.optional, (req, res, next) => {
 router.post('/like/', auth.optional, (req, res, next) => {
 	// postid will be within the req.body
 	// {postId: [postid]}
-	Post.findOneAndUpdate({_id: req.body.postId}, {$inc: {likeCount: 1}}, {new: true}).exec()
+	// Adding in checking on user to see if the user has already liked this post (within the likes array)
+	// if Yes, we decline them of doing anything (Cannot like a post theyve already liked)
+	// So we would need body to pass in current logged in user as well
+
+	User.findById(req.body.userId).exec().then((user) => {
+		console.log(user.likes);
+		console.log(user.likes.includes(req.body.postId))
+		console.log(user.likes[0] === req.body.postId)
+		console.log(typeof(user.likes[0]))
+		console.log(typeof(req.body.postId))
+		console.log(user.likes.map((element) => String(element)).includes(req.body.postId))
+		// Had to change objectId into String first
+		if (user.likes.map((element) => String(element)).includes(req.body.postId)) {
+			return res.status(403).json({
+				message: "User already liked this post!"
+			})
+		}
+		Post.findOneAndUpdate({_id: req.body.postId}, {$inc: {likeCount: 1}}, {new: true}).exec()
 		.then(updatedPost => {
 			if (!updatedPost) {
 				return res.status(404).json({
@@ -257,11 +274,20 @@ router.post('/like/', auth.optional, (req, res, next) => {
 				message: `Error: ${err}`,
 			});
 		});
+	})
 });
 
 // Unlike a post
 router.post('/unlike', auth.optional, (req, res, next) => {
-	Post.findOneAndUpdate({_id: req.body.postId}, {$inc: {likeCount: -1}}, {new: true}).exec()
+
+	User.findById(req.body.userId).exec().then((user) => {
+
+		if (!user.likes.map((element) => String(element)).includes(req.body.postId)) {
+			return res.status(403).json({
+				message: "User NEVER liked this post in order to UNLike it!"
+			});
+		}
+		Post.findOneAndUpdate({_id: req.body.postId}, {$inc: {likeCount: -1}}, {new: true}).exec()
 		.then(updatedPost => {
 			if (!updatedPost) {
 				return res.status(404).json({
@@ -284,6 +310,8 @@ router.post('/unlike', auth.optional, (req, res, next) => {
 				message: `Error: ${err}`,
 			});
 		});
+	})
+	
 })
 
 
