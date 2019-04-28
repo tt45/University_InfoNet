@@ -48,6 +48,7 @@ router.get('/', auth.optional, function(req, res) {
 
 
 router.get('/:postId', auth.optional, (req, res, next) => {
+	// console.log(req.headers);
 	const id = req.params.postId;
 	Post
 	.findById(id)
@@ -89,7 +90,7 @@ router.get('/user/:id', auth.optional, function(req, res) {
 		} else {
 			res.status(404).send({
 				message: `Cannot Find Post of ID: ${req.params.id}`,
-				data:[]
+				data:[],
 			});
 		}
 	}).catch((error) => {

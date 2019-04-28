@@ -73,7 +73,6 @@ router.post('/signup', auth.optional, (req, res, next) => {
 				message: "Email exists!"
 			});
 		}
-		console.log("Whats the fuck!");
 		const finalUser = new User({
 			_id: new mongoose.Types.ObjectId(),
 			email: req.body.email,
@@ -86,10 +85,8 @@ router.post('/signup', auth.optional, (req, res, next) => {
 			expectedGraduation: req.body.expectedGraduation,
 		});
   
-		console.log("finalUser", finalUser);
 		finalUser.setPassword(req.body.password);
 	  
-		console.log("finalUser", finalUser);
 		return finalUser.save()
 		  .then(() => res.json({ user: finalUser.toAuthJSON() }));
 
@@ -120,14 +117,13 @@ router.post('/signup', auth.optional, (req, res, next) => {
 	  if(err) {
 		return next(err);
 	  }
-  
 	  if(passportUser) {
 		const user = passportUser;
 		user.token = passportUser.generateJWT();
-  
 		return res.json({ 
-			user: user.toAuthJSON()
-		});
+				userToken: user.toAuthJSON(),
+				user: user
+			});
 	  }
 	  
 	  return res.json({
@@ -145,8 +141,8 @@ function appendStringParen(queryParam) {
 
 // Get certain user based on user ID
 router.get('/:id', auth.optional, function(req, res) {
-
-	console.log("OVerHERE\n++++++++++++" + req);
+	// console.log(req.payload);
+	// console.log(req.headers);
 	User.findOne({_id: req.params.id}).exec()
 	.then((user) => {
 		if (user) {
@@ -167,5 +163,22 @@ router.get('/:id', auth.optional, function(req, res) {
 		})
 	});
 });
+
+// Get the list of posts users liked/ Current logged in User is passed in from the frontend req.body
+router.get('/liked/posts', auth.optional, (req, res, next) => {
+	console.log(req.body.user.likes);
+	Post.find({_id: {$in: req.body.user.likes}}).exec()
+		.then((liked_posts) => {
+			res.status(200).send({
+				message: "OK!",
+				data: liked_posts
+			});
+		})
+		.catch(err => {
+			res.status(500).send({
+				message: "Server ERROR" + err
+			})
+		})
+})
 
 module.exports = router;

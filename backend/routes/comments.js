@@ -10,7 +10,7 @@ router.use(express.json());
 
 
 router.get('/', function(req, res) {
-
+    console.log(req.body);
     Comment.find({}).then((comments) => {
         if (comments.length === 0) {
             return res.status(404).json({
@@ -138,21 +138,21 @@ router.put('/:id', auth.optional, function(req, res) {
 // Create a comment under the a Post based on PostID
 router.post('/post', auth.optional, function(req, res) {
     // Post body will contain the info of the comment (provides context of comment and user info who made the comment based on comment schema)
-    // {post_id : [post_id], context: String, commentedBy: [userId]}
+    // {postId : [postId], context: String, commentedBy: [userId]}
     comment_json = {
         context: req.body.context,
         commentedBy: req.body.commentedBy,
-        commentPost: req.body.post_id
+        commentPost: req.body.postId
     }
     console.log(req.body.commentPost);
     let new_comment = new Comment(comment_json);
     console.log(new_comment);
     new_comment.save().then((created_comment) => {
         // Update the new comment ID into the Post referenced "comments" array
-        Post.update({_id: req.body.post_id}, {$push: {comments: created_comment._id} }).exec()
+        Post.update({_id: req.body.postId}, {$push: {comments: created_comment._id} }).exec()
             .then(updated_post => {
                 res.status(200).send({
-                    message: `Created comment for postID: ${req.body.post_id}`,
+                    message: `Created comment for postID: ${req.body.postId}`,
                     data: updated_post
                 });
             })
