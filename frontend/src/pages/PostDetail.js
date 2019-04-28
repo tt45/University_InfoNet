@@ -34,6 +34,7 @@ class PostDetail extends Component {
 
         render() {
                 const {post, comments} = this.props;
+                console.log(post, comments)
                 return (
                         <div className='postDetail'>
                                 <Card>

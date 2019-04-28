@@ -14,8 +14,10 @@ export function fetchPost(post_id) {
                                         })
                         )
                 )
-                .then(responses =>
-                        dispatch(fetchPostSuccess(responses[0].data, responses[1].data)))
+                .then(responses => {
+                        console.log(responses);
+                        dispatch(fetchPostSuccess(responses[0].data, responses[1].data));
+                })
                 .catch(err => console.log(err))
         }
 }
