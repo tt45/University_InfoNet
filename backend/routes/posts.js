@@ -60,10 +60,14 @@ router.get('/:postId', auth.optional, (req, res, next) => {
 			});
 		}
 		User.findById(post.postedBy).exec().then(user => {
+			let newpost = post.toJSON();
+			console.log(newpost)
+			newpost["postedByUserName"] = user.username
+			console.log(newpost);
 			res.status(200).json({
 				message: "Find Post!",
-				data: post,
-				postedBy: user.username
+				data: newpost,
+				// postedBy: user.username
 			});	
 		}).catch(err => {
 			res.status(500).json({
