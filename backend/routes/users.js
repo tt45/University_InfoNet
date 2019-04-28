@@ -140,7 +140,7 @@ function appendStringParen(queryParam) {
 
 
 // Get certain user based on user ID
-router.get('/:id', auth.required, function(req, res) {
+router.get('/:id', auth.optional, function(req, res) {
 	// console.log(req.payload);
 	// console.log(req.headers);
 	User.findOne({_id: req.params.id}).exec()
@@ -163,5 +163,22 @@ router.get('/:id', auth.required, function(req, res) {
 		})
 	});
 });
+
+// Get the list of posts users liked/ Current logged in User is passed in from the frontend req.body
+router.get('/liked/posts', auth.optional, (req, res, next) => {
+	console.log(req.body.user.likes);
+	Post.find({_id: {$in: req.body.user.likes}}).exec()
+		.then((liked_posts) => {
+			res.status(200).send({
+				message: "OK!",
+				data: liked_posts
+			});
+		})
+		.catch(err => {
+			res.status(500).send({
+				message: "Server ERROR" + err
+			})
+		})
+})
 
 module.exports = router;
