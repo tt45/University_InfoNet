@@ -7,7 +7,6 @@ export function fetchPosts() {
     })
       .then(function (response) {
               dispatch(fetchPostsSuccess(response.data.data));
-              console.log(response.data.data, 'fetch posts')
       })
       .catch(function (error) {
               console.log(error);

@@ -7,13 +7,11 @@ const initialState = {
 function postReducer(state=initialState, action) {
         switch (action.type){
                 case "FETCH_POSTS_SUCCESS":
-                        console.log('fetch post success')
                         return {
                                 ...state,
                                 posts: action.payload.posts
                         };
                 case "FETCH_POSTS_FAILURE":
-                        console.log('fetch post fail')
                         return state;
 
                 case "FILTER_POSTS":

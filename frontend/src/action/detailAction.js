@@ -7,7 +7,6 @@ export function fetchPost(post_id) {
     })
       .then(function (response) {
               dispatch(fetchPostSuccess(response.data.data));
-              console.log(response.data.data, 'fetch detail')
       })
       .catch(function (error) {
               console.log(error);
@@ -16,22 +15,30 @@ export function fetchPost(post_id) {
   };
 }
 
-export function fetchPostComment(comment_arr) {
-        //var comment_objects = [];
+export function fetchPostComment(post_id) {
         return dispatch => {
-                Promise.all(
-                        comment_arr.map(comment_id=>
-                                axios.get("http://127.0.0.1:4000/comments/"+comment_id)
-                                .then(function(response) {
-                                        return response.data
-                                })
-                                .catch(function(err) {
-                                        console.log(err);
-                                })
-                        )
-                ).then(responses =>
-                        dispatch(fetchPostCommentSuccess(responses))
-                ).catch(err => console.log(err))
+                return axios.get("http://127.0.0.1:4000/comments/post/"+post_id, {
+                  })
+                  .then(function (response) {
+                          console.log(response);
+                          dispatch(fetchPostCommentSuccess(response.data.data));
+                  })
+                  .catch(function (error) {
+                          console.log(error);
+                  });
+                // Promise.all(
+                //         comment_arr.map(comment_id=>
+                //                 axios.get("http://127.0.0.1:4000/comments/"+comment_id)
+                //                 .then(function(response) {
+                //                         return response.data
+                //                 })
+                //                 .catch(function(err) {
+                //                         console.log(err);
+                //                 })
+                //         )
+                // ).then(responses =>
+                //         dispatch(fetchPostCommentSuccess(responses))
+                // ).catch(err => console.log(err))
         }
 }
 
