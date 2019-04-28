@@ -8,7 +8,7 @@ module.exports = function (app, router) {
     app.use('/comments', require('./comments.js'));
 
     app.use((req, res, next) => {
-        const error = new Error('404 jdjfadsf Not found');
+        const error = new Error('404 Not found');
         error.status = 404;
         next(error);
     });
