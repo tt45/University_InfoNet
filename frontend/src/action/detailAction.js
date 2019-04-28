@@ -38,6 +38,21 @@ export function submitCommentToPost(input, user_id, post_id) {
         }
 }
 
+export function likePost(post_id, user_id) {
+        return dispatch => {
+                axios.post("http://127.0.0.1:4000/posts/like", {
+                        postId: [post_id],
+                        commentedBy: [user_id],
+                })
+                .then(function (response){
+                        dispatch(fetchPost(post_id));
+                })
+                .catch(function (err) {
+                        console.log(err);
+                })
+        }
+}
+
 export const fetchPostSuccess = (post, comments) => ({
         type: "FETCH_POST_SUCCESS",
         payload: { post, comments }

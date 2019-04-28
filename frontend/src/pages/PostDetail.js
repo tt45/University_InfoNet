@@ -3,7 +3,7 @@ import {Card, Badge, Form, Button} from 'react-bootstrap';
 import { connect } from "react-redux";
 import { FaThumbsUp } from "react-icons/fa";
 
-import {fetchPost, submitCommentToPost} from '../action/detailAction'
+import {fetchPost, submitCommentToPost, likePost} from '../action/detailAction'
 import './PostDetail.scss'
 
 class PostDetail extends Component {
@@ -14,8 +14,14 @@ class PostDetail extends Component {
                 }
                 this.inputChange = this.inputChange.bind(this);
                 this.handleSubmit = this.handleSubmit.bind(this);
+                this.likePost = this.likePost.bind(this);
         }
 
+        async componentDidMount() {
+                const post_id = this.props.match.params.post_id;
+                await this.props.dispatch(fetchPost(post_id));
+
+        }
 
         inputChange(event) {
                 this.setState({input: event.target.value});
@@ -27,14 +33,15 @@ class PostDetail extends Component {
                 this.props.dispatch(submitCommentToPost(this.state.input, this.props.user._id, this.props.post._id));
         }
 
-        async componentDidMount() {
-                const post_id = this.props.match.params.post_id;
-                await this.props.dispatch(fetchPost(post_id));
+        likePost() {
+                console.log('like post');
+                this.props.dispatch(likePost(this.props.post._id, this.props.user._id))
+                //post_id, user_id, POST posts/like
         }
 
         render() {
-                const {post, comments} = this.props;
-                console.log(post, comments)
+                const {user, post, comments} = this.props;
+                console.log(user, post, comments)
                 return (
                         <div className='postDetail'>
                                 <Card>
@@ -51,8 +58,8 @@ class PostDetail extends Component {
                                     </blockquote>
                                     <div className='other_info'>
                                         <Badge className='tag_name' variant="secondary">{post.category}</Badge>
-                                        <div className='like_post'>
-                                            <FaThumbsUp/>
+                                        <div className='like_post' onClick={this.likePost}>
+                                            <FaThumbsUp style={(user.likes.includes(post._id))?{color: 'blue'}:{color: 'black'}}/>
                                             <p className='like_number'>{post.likeCount}</p>
                                         </div>
                                     </div>
@@ -60,7 +67,7 @@ class PostDetail extends Component {
                                 </Card>
                                 {comments.map(comment =>
                                   <Card key={comment._id} border="info">
-                                    <Card.Header className="CommentHeader">Commented By: </Card.Header>
+                                    <Card.Header className="CommentHeader">Commented By: {comment.commentedByUserName}</Card.Header>
                                     <Card.Body>
                                       <Card.Text>
                                         {comment.context}

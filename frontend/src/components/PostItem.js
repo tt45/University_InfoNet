@@ -22,7 +22,7 @@ class PostItem extends Component {
                             <div className='other_info'>
                                 <Badge className='tag_name' variant="secondary">{this.props.category}</Badge>
                                 <div className='like_post'>
-                                    <FaThumbsUp style={(user._id===this.props.postedBy)?{color: 'black'}:{color: 'blue'}}/>
+                                    <FaThumbsUp style={(user.likes.includes(this.props._id))?{color: 'blue'}:{color: 'black'}}/>
                                     <p className='like_number'>{this.props.likeCount}</p>
                                 </div>
                             </div>

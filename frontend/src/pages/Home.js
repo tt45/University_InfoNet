@@ -5,7 +5,8 @@ import { connect } from "react-redux";
 import './Home.scss'
 import PostItem from '../components/PostItem';
 import {filterPosts, searchPosts} from '../action/postAction'
-
+import {fetchUser} from '../action/userAction';
+import {fetchPosts} from '../action/postAction';
 
 class Home extends Component {
         constructor(props) {
@@ -15,6 +16,11 @@ class Home extends Component {
                 }
                 this.inputChange = this.inputChange.bind(this);
                 this.handleSubmit = this.handleSubmit.bind(this);
+        }
+
+        async componentDidMount() {
+                await this.props.dispatch(fetchUser());
+                await this.props.dispatch(fetchPosts());
         }
 
         inputChange(event) {
