@@ -145,6 +145,8 @@ function appendStringParen(queryParam) {
 
 // Get certain user based on user ID
 router.get('/:id', auth.required, function(req, res) {
+	
+	console.log("OVerHERE\n++++++++++++" + req);
 	User.findOne({_id: req.params.id}).exec()
 	.then((user) => {
 		if (user) {
