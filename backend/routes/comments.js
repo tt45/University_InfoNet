@@ -49,7 +49,7 @@ router.get('/:id', function(req, res) {
 });
 
 // Get all comments commented by user based on user_id
-router.get('/user/:user_id', auth.required, function(req, res) {
+router.get('/user/:user_id', auth.optional, function(req, res) {
 
     Comment.findOne({commentedBy: req.params.user_id}).then((comments) => {
         if (!comments) {
@@ -105,7 +105,7 @@ router.get('/post/:post_id', function(req, res) {
 
 
 // Update comment based on commentID
-router.put('/:id', auth.required, function(req, res) {
+router.put('/:id', auth.optional, function(req, res) {
     // field in req.body: context
     Comment.findOne({_id: req.params.id}).exec().then(comment => {
         if (!comment) {
@@ -136,14 +136,17 @@ router.put('/:id', auth.required, function(req, res) {
 
 
 // Create a comment under the a Post based on PostID
-router.post('/post', auth.required, function(req, res) {
+router.post('/post', auth.optional, function(req, res) {
     // Post body will contain the info of the comment (provides context of comment and user info who made the comment based on comment schema)
     // {post_id : [post_id], context: String, commentedBy: [userId]}
     comment_json = {
         context: req.body.context,
         commentedBy: req.body.commentedBy,
+        commentPost: req.body.post_id
     }
+    console.log(req.body.commentPost);
     let new_comment = new Comment(comment_json);
+    console.log(new_comment);
     new_comment.save().then((created_comment) => {
         // Update the new comment ID into the Post referenced "comments" array
         Post.update({_id: req.body.post_id}, {$push: {comments: created_comment._id} }).exec()
@@ -170,7 +173,7 @@ router.post('/post', auth.required, function(req, res) {
 
 
 // Delete a comment given comment-id
-router.delete('/:commentId', auth.required, (req, res, next) => {
+router.delete('/:commentId', auth.optional, (req, res, next) => {
     Comment
     .findById(req.params.commentId)
     .exec()
