@@ -142,8 +142,11 @@ router.post('/post', auth.optional, function(req, res) {
     comment_json = {
         context: req.body.context,
         commentedBy: req.body.commentedBy,
+        commentPost: req.body.post_id
     }
+    console.log(req.body.commentPost);
     let new_comment = new Comment(comment_json);
+    console.log(new_comment);
     new_comment.save().then((created_comment) => {
         // Update the new comment ID into the Post referenced "comments" array
         Post.update({_id: req.body.post_id}, {$push: {comments: created_comment._id} }).exec()
