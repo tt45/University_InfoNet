@@ -61,7 +61,8 @@ router.get('/:postId', auth.optional, (req, res, next) => {
 		}
 		res.status(200).json({
 			message: "Find Post!",
-			data: post
+			data: post,
+			postedBy: post.postedBy.username
 		});
 	})
 	.catch(err => {
