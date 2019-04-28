@@ -124,8 +124,9 @@ router.post('/signup', auth.optional, (req, res, next) => {
 		const user = passportUser;
 		user.token = passportUser.generateJWT();
 		return res.json({ 
-			user: user.toAuthJSON()
-		});
+				userToken: user.toAuthJSON(),
+				user: user
+			});
 	  }
 	  
 	  return res.json({
