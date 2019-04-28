@@ -72,7 +72,7 @@ router.get('/:postId', auth.optional, (req, res, next) => {
 
 
 // Get certain post based on UserID   Can put queries at the end 
-router.get('/user/:id', auth.required, function(req, res) {
+router.get('/user/:id', auth.optional, function(req, res) {
 
 	const query = req.query;
 	// If not specified, then its just throwing out all posts created by that user...
@@ -103,7 +103,7 @@ router.get('/user/:id', auth.required, function(req, res) {
 
 
 // Create new post
-router.post('/', auth.required, (req, res, next) => {
+router.post('/', auth.optional, (req, res, next) => {
 	const newPost = new Post({
 		_id: new mongoose.Types.ObjectId(),
 		title: req.body.title,
@@ -140,7 +140,7 @@ router.post('/', auth.required, (req, res, next) => {
 	});
 });
 
-router.delete('/:postId', auth.required, (req, res, next) => {
+router.delete('/:postId', auth.optional, (req, res, next) => {
 	Post
 	.findById(req.params.postId)
 	.then(post => {
@@ -178,7 +178,7 @@ router.delete('/:postId', auth.required, (req, res, next) => {
 
 });
 
-router.patch('/:postId', auth.required, (req, res, next) => {
+router.patch('/:postId', auth.optional, (req, res, next) => {
 	const id = req.params.postId;
 	const updateOps = {};
     for (const ops of req.body) {
