@@ -51,7 +51,7 @@ router.get('/:postId', auth.optional, (req, res, next) => {
 	// console.log(req.headers);
 	const id = req.params.postId;
 	Post
-	.findById(id).populate('postedBy')
+	.findById(id)
 	.exec()
 	.then(post => {
 		if (!post) {
@@ -59,11 +59,17 @@ router.get('/:postId', auth.optional, (req, res, next) => {
 				message: "Post does not exist!"
 			});
 		}
-		res.status(200).json({
-			message: "Find Post!",
-			data: post,
-			postedBy: post.postedBy.username
-		});
+		User.findById(post.postedBy).exec().then(user => {
+			res.status(200).json({
+				message: "Find Post!",
+				data: post,
+				postedBy: user.username
+			});	
+		}).catch(err => {
+			res.status(500).json({
+				error: err
+			});
+		})
 	})
 	.catch(err => {
 		res.status(500).json({
