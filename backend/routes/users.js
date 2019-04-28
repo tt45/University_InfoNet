@@ -167,7 +167,7 @@ router.get('/:id', auth.optional, function(req, res) {
 // Get the list of posts users liked/ Current logged in UserLikes array is passed in from the frontend req.body
 router.get('/liked/posts', auth.optional, (req, res, next) => {
 	console.log(req.body.userLikes);
-	Post.find({_id: {$in: req.body.user.likes}}).exec()
+	Post.find({_id: {$in: req.body.userLikes}}).exec()
 		.then((liked_posts) => {
 			res.status(200).send({
 				message: "OK!",

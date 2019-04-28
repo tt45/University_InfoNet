@@ -78,10 +78,11 @@ router.get('/post/:post_id', function(req, res) {
                 data: []
             });
         }
-        console.log(post);
+        // console.log(post);
         let list_of_comments_id = post.comments;
-        console.log(list_of_comments_id);
-        Comment.find({_id: {$in : list_of_comments_id}}).then((comments) => {
+        // console.log(list_of_comments_id); // Populate it
+        Comment.find({_id: {$in : list_of_comments_id}}).populate('commentedBy')
+        .then((comments) => {
             if (comments.length == 0) {
                 
                 return res.status(200).json({
@@ -90,6 +91,7 @@ router.get('/post/:post_id', function(req, res) {
                 });
                 
             }
+
             res.status(200).send({
                 message: `Comments commented to PostID ${req.params.post_id}.` ,
                 data: comments
