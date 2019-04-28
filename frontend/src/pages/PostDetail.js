@@ -1,22 +1,40 @@
 import React, { Component } from 'react';
-import {Card, Badge} from 'react-bootstrap';
+import {Card, Badge, Form, Button} from 'react-bootstrap';
 import { connect } from "react-redux";
 import { FaThumbsUp } from "react-icons/fa";
 
-import {fetchPost, fetchPostComment} from '../action/detailAction'
+import {fetchPost, fetchPostComment, submitCommentToPost} from '../action/detailAction'
 import './PostDetail.scss'
 
 class PostDetail extends Component {
+        constructor(props) {
+                super(props);
+                this.state = {
+                        input: '',
+                }
+                this.inputChange = this.inputChange.bind(this);
+                this.handleSubmit = this.handleSubmit.bind(this);
+        }
+
+
+        inputChange(event) {
+                this.setState({input: event.target.value});
+        }
+
+
+        handleSubmit() {
+                console.log(this.state.input)
+                console.log( this.props.post.postedBy, this.props.post._id)
+                this.props.dispatch(submitCommentToPost(this.state.input, this.props.post.postedBy, this.props.post._id));
+        }
 
         async componentDidMount() {
                 const post_id = this.props.match.params.post_id;
                 await this.props.dispatch(fetchPost(post_id));
-                await this.props.dispatch(fetchPostComment(post_id));
         }
 
         render() {
-                const {post, user, comments} = this.props;
-                console.log(comments, 'post comments')
+                const {post, comments} = this.props;
                 return (
                         <div className='postDetail'>
                                 <Card>
@@ -28,7 +46,7 @@ class PostDetail extends Component {
                                         {post.context}{' '}
                                       </p>
                                       <footer className="blockquote-footer">
-                                        {user.username}
+                                        {post.postedBy}
                                       </footer>
                                     </blockquote>
                                     <div className='other_info'>
@@ -40,7 +58,22 @@ class PostDetail extends Component {
                                     </div>
                                   </Card.Body>
                                 </Card>
-
+                                {comments.map(comment =>
+                                  <Card key={comment._id} border="info">
+                                    <Card.Header className="CommentHeader">Commented By: {comment.commentedBy}</Card.Header>
+                                    <Card.Body>
+                                      <Card.Text>
+                                        {comment.context}
+                                      </Card.Text>
+                                    </Card.Body>
+                                  </Card>)}
+                                  <div className="comment_section">
+                                          <Form.Group controlId="exampleForm.ControlTextarea1">
+                                            <Form.Label>Comment:</Form.Label>
+                                            <Form.Control as="textarea" rows="3" onChange={this.inputChange}/>
+                                          </Form.Group>
+                                          <Button className="submit_comment" as="input" type="submit" value="Submit" onClick={this.handleSubmit}/>
+                                  </div>
                         </div>
                 )
         }
@@ -50,7 +83,6 @@ function mapStateToProps(state) {
         console.log(state);
         return {
                 post: state.detailReducer.post,
-                user: state.userReducer.user,
                 comments: state.detailReducer.comments,
         }
 }
