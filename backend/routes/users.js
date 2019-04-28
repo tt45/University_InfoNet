@@ -73,7 +73,6 @@ router.post('/signup', auth.optional, (req, res, next) => {
 				message: "Email exists!"
 			});
 		}
-		console.log("Whats the fuck!");
 		const finalUser = new User({
 			_id: new mongoose.Types.ObjectId(),
 			email: req.body.email,
@@ -86,10 +85,8 @@ router.post('/signup', auth.optional, (req, res, next) => {
 			expectedGraduation: req.body.expectedGraduation,
 		});
   
-		console.log("finalUser", finalUser);
 		finalUser.setPassword(req.body.password);
 	  
-		console.log("finalUser", finalUser);
 		return finalUser.save()
 		  .then(() => res.json({ user: finalUser.toAuthJSON() }));
 
