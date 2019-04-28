@@ -189,7 +189,7 @@ router.patch('/:postId', auth.optional, (req, res, next) => {
 	.exec()
 	.then(post => {
 		if (!post) {
-			return res.status(500).json({
+			return res.status(404).json({
 				message: "Post does not exist!"
 			});
 		}
@@ -211,6 +211,63 @@ router.patch('/:postId', auth.optional, (req, res, next) => {
         });
     });
 });
+
+
+// Liking a post
+router.post('/like/', auth.optional, (req, res, next) => {
+	// postid will be within the req.body
+	// {postId: [postid]}
+	Post.findOneAndUpdate({_id: req.body.postId}, {$inc: {likeCount: 1}}, {new: true}).exec()
+		.then(updatedPost => {
+			if (!updatedPost) {
+				return res.status(404).json({
+					message: "Post does not exist!"
+				});
+			}
+			// Currently pretend that the user would be passed within the request.body, for the sake of postman testing (before knowing how passport works...)
+			User.update({_id: req.body.userId}, {$push: {likes: updatedPost._id}}).exec()
+				.then(user => {
+					res.status(200).send({
+						message: `User ${req.body.userId} Liked ${req.body.postId}`,
+					});
+				}).catch(err => {
+					res.status(500).send({
+						message: `Error: ${err}`,
+					});
+				})
+		}).catch(err => {
+			res.status(500).send({
+				message: `Error: ${err}`,
+			});
+		});
+});
+
+// Unlike a post
+router.post('/unlike', auth.optional, (req, res, next) => {
+	Post.findOneAndUpdate({_id: req.body.postId}, {$inc: {likeCount: -1}}, {new: true}).exec()
+		.then(updatedPost => {
+			if (!updatedPost) {
+				return res.status(404).json({
+					message: "Post does not exist!"
+				});
+			}
+			// Currently pretend that the user would be passed within the request.body, for the sake of postman testing (before knowing how passport works...)
+			User.update({_id: req.body.userId}, {$pull: {likes: updatedPost._id}}).exec()
+				.then(user => {
+					res.status(200).send({
+						message: `User ${req.body.userId} Unliked ${req.body.postId}`,
+					});
+				}).catch(err => {
+					res.status(500).send({
+						message: `Error: ${err}`,
+					});
+				})
+		}).catch(err => {
+			res.status(500).send({
+				message: `Error: ${err}`,
+			});
+		});
+})
 
 
 

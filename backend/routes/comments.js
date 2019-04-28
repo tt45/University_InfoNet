@@ -79,7 +79,7 @@ router.get('/post/:post_id', function(req, res) {
             });
         }
         console.log(post);
-        let list_of_comments_id = post[0].comments;
+        let list_of_comments_id = post.comments;
         console.log(list_of_comments_id);
         Comment.find({_id: {$in : list_of_comments_id}}).then((comments) => {
             if (comments.length == 0) {
