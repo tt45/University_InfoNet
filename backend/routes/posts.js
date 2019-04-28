@@ -31,7 +31,7 @@ router.get('/', auth.optional, function(req, res) {
 	const limitParam = query.limit ? eval(appendStringParen(query.limit)) : 0;
 	const countTrue = query.count ? eval(query.count) : false;
 
-	Post.find(whereParam).select(selectParam).sort(sortParam).skip(skipParam).limit(limitParam).populate('postedBy')
+	Post.find(whereParam).select(selectParam).sort(sortParam).skip(skipParam).limit(limitParam)
 		.exec()
 		.then((tasks_list) => {
 			res.status(200).send({
@@ -114,36 +114,41 @@ router.get('/user/:id', auth.optional, function(req, res) {
 });
 
 
-// Create new post
+// Create new post // { postedBy: [userID] , university: [university Name], category: [category]} 
+// will be passed within the req.body
 router.post('/', auth.optional, (req, res, next) => {
-	const newPost = new Post({
-		_id: new mongoose.Types.ObjectId(),
-		title: req.body.title,
-		context: req.body.context,
-		likeCount: req.body.likeCount,
-		createdTime: req.body.createdTime,
-		university: req.body.university,
-		comments: req.body.comments,
-		postedBy: req.body.postedBy,
-		category: req.body.category
-	});
-	newPost
-	.save()
-	.then(result => {
-		res.status(201).json({
-			message: "Create Post succesfully",
-			createdPost: {
-				_id: newPost._id,
-				title: newPost.title,
-				context: newPost.context,
-				likeCount: newPost.likeCount,
-				createdTime: newPost.createdTime,
-				university: newPost.university,
-				comments: newPost.comments,
-				postedBy: newPost.postedBy,
-				category: newPost.category
-			}
+
+	User.findById(req.body.postedBy).exec().then((user) => {
+		const newPost = new Post({
+			_id: new mongoose.Types.ObjectId(),
+			title: req.body.title,
+			context: req.body.context,
+			// likeCount: req.body.likeCount,
+			// createdTime: req.body.createdTime,
+			university: req.body.university,
+			// comments: req.body.comments,
+			postedBy: req.body.postedBy,
+			category: req.body.category,
+			postedByUserName: user.username
 		});
+		newPost.save()
+		.then(result => {
+			res.status(201).json({
+				message: "Create Post succesfully",
+				// createdPost: {
+				// 	_id: newPost._id,
+				// 	title: newPost.title,
+				// 	context: newPost.context,
+				// 	likeCount: newPost.likeCount,
+				// 	createdTime: newPost.createdTime,
+				// 	university: newPost.university,
+				// 	comments: newPost.comments,
+				// 	postedBy: newPost.postedBy,
+				// 	category: newPost.category
+				// }
+				createdPost: result
+			});
+		})
 	})
 	.catch(err => {
 		res.status(500).json({
