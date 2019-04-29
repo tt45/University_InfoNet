@@ -79,7 +79,7 @@ router.get('/:postId', auth.optional, (req, res, next) => {
 });
 
 
-// Get certain post based on UserID   Can put queries at the end 
+// Get certain posts based on UserID   Can put queries at the end 
 router.get('/user/:id', auth.optional, function(req, res) {
 
 	const query = req.query;
@@ -87,12 +87,12 @@ router.get('/user/:id', auth.optional, function(req, res) {
 	const whereParam = query.where ? eval(appendStringParen(query.where)) : {};
 	whereParam.postedBy = req.params.id;
 	
-	Post.findOne(whereParam).exec()
-	.then((task) => {
-		if (task) {
+	Post.find(whereParam).exec()
+	.then((posts) => {
+		if (posts) {
 			res.status(200).send({
 				message: `OK. Post ID: ${req.params.id} found.`,
-				data:task
+				data:posts
 			});
 		} else {
 			res.status(404).send({
