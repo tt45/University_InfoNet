@@ -60,14 +60,10 @@ router.get('/:postId', auth.optional, (req, res, next) => {
 			});
 		}
 		User.findById(post.postedBy).exec().then(user => {
-			let newpost = post.toJSON();
-			console.log(newpost)
-			newpost["postedByUserName"] = user.username
-			console.log(newpost);
+
 			res.status(200).json({
 				message: "Find Post!",
-				data: newpost,
-				// postedBy: user.username
+				data: post,
 			});	
 		}).catch(err => {
 			res.status(500).json({
@@ -258,7 +254,6 @@ router.post('/like/', auth.optional, (req, res, next) => {
 					message: "Post does not exist!"
 				});
 			}
-			// Currently pretend that the user would be passed within the request.body, for the sake of postman testing (before knowing how passport works...)
 			User.update({_id: req.body.userId}, {$push: {likes: updatedPost._id}}).exec()
 				.then(user => {
 					res.status(200).send({
