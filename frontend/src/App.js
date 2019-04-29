@@ -13,10 +13,10 @@ import {fetchUser} from './action/userAction';
 import {fetchPosts} from './action/postAction';
 
 class App extends Component {
-        // async componentDidMount() {
-        //         await this.props.dispatch(fetchUser());
-        //         await this.props.dispatch(fetchPosts());
-        // }
+        async componentDidMount() {
+                await this.props.dispatch(fetchUser());
+                await this.props.dispatch(fetchPosts());
+        }
 
 
   render() {

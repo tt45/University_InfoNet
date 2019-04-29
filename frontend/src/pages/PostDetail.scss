@@ -3,6 +3,9 @@
 }
 .CommentHeader {
         font-size: 20px;
+        .delete_button {
+                float: right;
+        }
 }
 .comment_section{
         width: 80vw;
@@ -16,4 +19,5 @@
         .submit_comment {
 
         }
+
 }

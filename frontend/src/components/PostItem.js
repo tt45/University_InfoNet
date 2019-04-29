@@ -7,23 +7,24 @@ import { connect } from "react-redux";
 import './PostItem.scss'
 
 class PostItem extends Component {
+
         render() {
-                const {user} =this.props;
+                const {user, post} =this.props;
                 return (
                         <Card>
-                          <LinkContainer to={`posts/${this.props._id}`}>
+                          <LinkContainer to={{pathname: `posts/${post._id}`, state: {user: user, post: post}}}>
                           <Card.Body>
                             <div className='content_body'>
-                            <Card.Title>{this.props.title}</Card.Title>
+                            <Card.Title>{post.title}</Card.Title>
                             <Card.Text>
-                              {this.props.context}
+                              {post.context}
                             </Card.Text>
                             </div>
                             <div className='other_info'>
-                                <Badge className='tag_name' variant="secondary">{this.props.category}</Badge>
+                                <Badge className='tag_name' variant="secondary">{post.category}</Badge>
                                 <div className='like_post'>
-                                    <FaThumbsUp style={(user.likes.includes(this.props._id))?{color: 'blue'}:{color: 'black'}}/>
-                                    <p className='like_number'>{this.props.likeCount}</p>
+                                    <FaThumbsUp style={(user.likes.includes(post._id))?{color: 'orange'}:{color: 'black'}}/>
+                                    <p className='like_number'>{post.likeCount}</p>
                                 </div>
                             </div>
                           </Card.Body>
