@@ -51,8 +51,8 @@ UserSchema.methods.generateJWT = function() {
 UserSchema.methods.toAuthJSON = function() {
     return {
         _id: this._id,
-        email: this.email,
         token: this.generateJWT(),
+        email: this.email,
         username: this.username,
         university: this.university,
         firstName: this.firstName,
@@ -60,6 +60,8 @@ UserSchema.methods.toAuthJSON = function() {
         major: this.major,
         year: this.year,
         expectedGraduation: this.expectedGraduation,
+        dateCreated: this.dateCreated,
+        likes: this.likes
     };
 };
 
