@@ -9,7 +9,6 @@ export function fetchUser(user_id) {
     })
       .then(function (response) {
               dispatch(fetchUserSuccess(response.data.data));
-              console.log(response.data.data)
       })
       .catch(function (error) {
               console.log(error);
@@ -58,7 +57,6 @@ export function logIn(email, password) {
                             password: password,
                         })
                         .then(function (response) {
-                                console.log(response.data.user)
                                 dispatch(fetchUserSuccess(response.data.user));
                                 //dispatch(push('/home'));
                                 //dispatch(push('/home'));

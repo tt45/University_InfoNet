@@ -22,7 +22,7 @@ class CreatePost extends Component {
 
         handleSubmit() {
                 console.log(this.inputTitle.value, this.inputCategory.value, this.inputContext.value);
-                this.props.dispatch(createPost(this.props.user._id, this.inputTitle.value, this.inputCategory.value, this.inputContext.value));
+                this.props.dispatch(createPost(this.props.user._id, this.inputTitle.value, this.inputCategory.value, this.inputContext.value, this.props.user.university));
         }
 
         render() {

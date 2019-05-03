@@ -1,12 +1,14 @@
 import axios from 'axios';
 
 export function fetchPosts(user_id, university) {
+        console.log(user_id, university);
+        console.log(typeof(user_id), typeof(university))
   return dispatch => {
-    return axios.get("https://cs498-infonet.herokuapp.com/posts", {
-            _id: user_id,
-            university: university,
+    return axios.post("https://cs498-infonet.herokuapp.com/posts", {
+                    university: university,
     })
       .then(function (response) {
+              console.log(response);
               dispatch(fetchPostsSuccess(response.data.data));
       })
       .catch(function (error) {
@@ -16,9 +18,9 @@ export function fetchPosts(user_id, university) {
   };
 }
 
-export function createPost(user_id, title, category, context) {
+export function createPost(user_id, title, category, context, university) {
         return dispatch => {
-                return axios.post("https://cs498-infonet.herokuapp.com/posts", {
+                return axios.post("https://cs498-infonet.herokuapp.com/posts/createPost", {
                                 postedBy: user_id,
                                 title: title,
                                 category: category,
@@ -26,7 +28,7 @@ export function createPost(user_id, title, category, context) {
                         })
                         .then(function (response) {
                                 console.log(response)
-                                dispatch(fetchPosts())
+                                dispatch(fetchPosts(user_id, university))
                         })
                         .catch(function (err) {
                                 console.log(err);
