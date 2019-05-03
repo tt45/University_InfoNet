@@ -21,7 +21,7 @@ class Home extends Component {
         async componentDidMount() {
                 
                 console.log(this.props.location.state);
-                const user = this.props.location.state.loggedInUser;
+                const user = this.props.location.state.loggedInUser; // Access the user passed in from frontend Login Authentication
                 await this.props.dispatch(fetchUser());
                 await this.props.dispatch(fetchPosts());
         }
