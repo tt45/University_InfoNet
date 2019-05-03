@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { LinkContainer } from 'react-router-bootstrap';
 
 import {createPost} from '../action/postAction';
+import history from '../history';
 
 import './CreatePost.scss';
 
@@ -25,6 +26,7 @@ class CreatePost extends Component {
         }
 
         render() {
+                if (this.props.loggedIn)
                 return (
                         <Form className="create_post_form">
                           <div className="post_content">
@@ -55,12 +57,17 @@ class CreatePost extends Component {
                           </LinkContainer>
                         </Form>
                 )
+                else {
+                        history.push('/login');
+                        return null;
+                }
         }
 }
 
 function mapStateToProps(state) {
         return {
                 user: state.userReducer.user,
+                loggedIn: state.userReducer.loggedIn,
         }
 }
 

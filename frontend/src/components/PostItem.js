@@ -10,7 +10,6 @@ class PostItem extends Component {
 
         render() {
                 const {user, post} =this.props;
-                console.log(user, post)
                 return (
                         <Card className="shadow">
                           <LinkContainer to={{pathname: `posts/${post._id}`, state: {user: user, post: post}}}>

@@ -10,6 +10,8 @@ import PostDetail from './pages/PostDetail';
 import CreatePost from './pages/CreatePost';
 import Login from './pages/Login';
 import LoginF from './pages/LoginF';
+import LikedPost from './pages/LikedPost';
+import OwnPost from './pages/OwnPost';
 
 import {fetchUser} from './action/userAction';
 import {fetchPosts} from './action/postAction';
@@ -31,12 +33,13 @@ class App extends Component {
                         <Router history={history} basename={process.env.PUBLIC_URL}>
                                 <NavBar/>
                                 <Switch>
-                                  <Route path='/loginf' component={LoginF}/>
                                   <Route path='/login' component={Login}/>
                                   <Route path='/home' component={Home}/>
                                   <Route path='/profile' component={Profile}/>
                                   <Route path='/createPost' component={CreatePost}/>
                                   <Route path='/posts/:post_id' component={PostDetail}/>
+                                  <Route path='/likePosts' component={LikedPost}/>
+                                  <Route path='/ownPosts' component={OwnPost}/>
                                 </Switch>
                         </Router>
 

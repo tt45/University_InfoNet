@@ -18,6 +18,39 @@ export function fetchUser(user_id) {
   };
 }
 
+export function fetchOwnPost(user_id) {
+  return dispatch => {
+    return axios.get("http://127.0.0.1:4000/posts/user/"+user_id, {
+
+    })
+      .then(function (response) {
+              dispatch(fetchOwnPostSuccess(response.data.data))
+              console.log(response)
+      })
+      .catch(function (error) {
+              console.log(error);
+              dispatch(fetchUserFailure(error))
+      });
+  };
+}
+
+export function fetchLikePost(user_id) {
+        console.log(user_id);
+  return dispatch => {
+    return axios.get("http://127.0.0.1:4000/users/liked/posts/"+user_id, {
+
+    })
+      .then(function (response) {
+              dispatch(fetchOwnLikeSuccess(response.data.data))
+              console.log(response)
+      })
+      .catch(function (error) {
+              console.log(error);
+              dispatch(fetchUserFailure(error))
+      });
+  };
+}
+
 export function logIn(email, password) {
         return dispatch => {
                 return axios.post("http://127.0.0.1:4000/users/login", {
@@ -66,6 +99,15 @@ export function signUp(email, username, password, university, first, last, major
         }
 }
 
+export const fetchOwnPostSuccess = own_posts => ({
+        type: "FETCH_OWN_POST_SUCCESS",
+        payload: {own_posts}
+})
+
+export const fetchOwnLikeSuccess = like_posts => ({
+        type: "FETCH_LIKE_POST_SUCCESS",
+        payload: {like_posts}
+})
 
 export const fetchUserSuccess = user => ({
   type: "FETCH_USER_SUCCESS",

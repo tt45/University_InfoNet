@@ -7,6 +7,7 @@ import PostItem from '../components/PostItem';
 import {filterPosts, searchPosts} from '../action/postAction'
 import {fetchUser} from '../action/userAction';
 import {fetchPosts} from '../action/postAction';
+import history from '../history';
 
 class Home extends Component {
         constructor(props) {
@@ -37,6 +38,7 @@ class Home extends Component {
 
         render() {
                 const {posts} = this.props;
+                if (this.props.loggedIn)
                 return (
                         <div className='home_page'>
                                 <InputGroup className="input_group mb-3">
@@ -62,6 +64,11 @@ class Home extends Component {
                                         <PostItem key={post._id} post={post}/>)}
                         </div>
                 )
+                else {
+                        history.push('/login');
+                        return null;
+
+                };
         }
 }
 
@@ -70,6 +77,7 @@ function mapStateToProps(state) {
         const display_post = filter_category===''?posts:posts.filter((post)=>post.category===filter_category);
         return {
                 user: state.userReducer.user,
+                loggedIn: state.userReducer.loggedIn,
                 posts: search_input===''?display_post:display_post.filter(post=>post.title.toLowerCase().includes(search_input.toLowerCase())),
         }
 }

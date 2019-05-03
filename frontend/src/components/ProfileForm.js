@@ -15,7 +15,7 @@ class ProfileForm extends Component {
                              First Name:
                            </Form.Label>
                            <Col sm="10">
-                             <Form.Control plaintext readOnly defaultValue={user.firstname} />
+                             <Form.Control plaintext readOnly defaultValue={user.firstName} />
                            </Col>
                          </Form.Group>
 
@@ -24,7 +24,7 @@ class ProfileForm extends Component {
                              Last Name:
                            </Form.Label>
                            <Col sm="10">
-                             <Form.Control plaintext readOnly defaultValue={user.lastname} />
+                             <Form.Control plaintext readOnly defaultValue={user.lastName} />
                            </Col>
                          </Form.Group>
 
