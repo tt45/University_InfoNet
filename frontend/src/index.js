@@ -7,12 +7,13 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import { Provider } from 'react-redux';
 import configureStore from './store/configureStore';
+import Login from './pages/Login'
 
 const store = configureStore();
 
 
 ReactDOM.render(<Provider store={store}>
-                        <App />
+                        <Login/>
                 </Provider>
                 , document.getElementById('root'));
 
