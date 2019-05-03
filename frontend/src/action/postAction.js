@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-export function fetchPosts() {
+export function fetchPosts(user_id, university) {
   return dispatch => {
     return axios.get("http://127.0.0.1:4000/posts", {
-
+            _id: user_id,
+            university: university,
     })
       .then(function (response) {
               dispatch(fetchPostsSuccess(response.data.data));

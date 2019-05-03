@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { FaThumbsUp } from "react-icons/fa";
 
 import {fetchPost, submitCommentToPost, likePost, unlikePost, deleteComment} from '../action/detailAction';
-import {fetchUser} from '../action/userAction';
 import './PostDetail.scss'
 
 class PostDetail extends Component {
@@ -54,7 +53,7 @@ class PostDetail extends Component {
 
         deleteComment(comment_id) {
                 console.log(comment_id);
-                const {user, post}= this.props.location.state;
+                const { post}= this.props.location.state;
                 this.props.dispatch(deleteComment(post._id, comment_id));
         }
 
@@ -64,7 +63,7 @@ class PostDetail extends Component {
                 console.log(user, post, comments);
                 return (
                         <div className='postDetail'>
-                                <Card>
+                                <Card className='shadow'>
                                   <Card.Header>{post.title}</Card.Header>
                                   <Card.Body>
                                     <blockquote className="blockquote mb-0">
@@ -86,7 +85,7 @@ class PostDetail extends Component {
                                   </Card.Body>
                                 </Card>
                                 {comments.map(comment =>
-                                  <Card key={comment._id} border="info">
+                                  <Card className="shadow" key={comment._id} border="info">
                                     <Card.Header className="CommentHeader">Commented By: {comment.commentedByUserName}
                                         {(comment.commentedBy===user._id) &&
                                                 <Button className="delete_button" variant="danger" as="input" value="Delete" onClick={()=>this.deleteComment(comment._id)}/>

@@ -1,8 +1,10 @@
 import axios from 'axios';
+import history from '../history';
+//import { push } from 'react-router-redux';
 
-export function fetchUser() {
+export function fetchUser(user_id) {
   return dispatch => {
-    return axios.get("http://127.0.0.1:4000/users/5cc3d278633812b88eac305b", {
+    return axios.get("http://127.0.0.1:4000/users/"+user_id, {
 
     })
       .then(function (response) {
@@ -15,6 +17,55 @@ export function fetchUser() {
       });
   };
 }
+
+export function logIn(email, password) {
+        return dispatch => {
+                return axios.post("http://127.0.0.1:4000/users/login", {
+                            email: email,
+                            password: password,
+                        })
+                        .then(function (response) {
+                                console.log(response.data.user)
+                                dispatch(fetchUserSuccess(response.data.user));
+                                //dispatch(push('/home'));
+                                //dispatch(push('/home'));
+                                if (response.data.user) {
+                                        history.push('/home');
+                                }
+
+                                //browserHistory.push('/home');
+                                //accountObj = response["data"]["user"];
+                        })
+                        .catch(function (err) {
+                                console.log(err);
+                        })
+        }
+}
+
+
+export function signUp(email, username, password, university, first, last, major, classStanding) {
+        console.log(email, username, password, university, first, last, major, classStanding)
+        return dispatch => {
+                return axios.post("http://127.0.0.1:4000/users/signup", {
+                            email: email,
+                            username: username,
+                            password: password,
+                            university: university,
+                            firstName: first,
+                            lastName: last,
+                            major: major,
+                            year: classStanding,
+                            //expectedGraduation: "2019-04-23T12:05:36.000+00:00",
+                        })
+                        .then(function (response) {
+                                console.log(response)
+                        })
+                        .catch(function (err) {
+                                console.log(err);
+                        })
+        }
+}
+
 
 export const fetchUserSuccess = user => ({
   type: "FETCH_USER_SUCCESS",

@@ -40,6 +40,7 @@ export function submitCommentToPost(input, user_id, post_id) {
 }
 
 export function likePost(post_id, user_id) {
+        console.log(post_id, user_id);
         return dispatch => {
                 axios.post("http://127.0.0.1:4000/posts/like", {
                         postId: post_id,

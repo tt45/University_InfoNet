@@ -19,8 +19,8 @@ class Home extends Component {
         }
 
         async componentDidMount() {
-                await this.props.dispatch(fetchUser());
-                await this.props.dispatch(fetchPosts());
+                await this.props.dispatch(fetchUser(this.props.user._id));
+                await this.props.dispatch(fetchPosts(this.props.user._id, this.props.user.university));
         }
 
         inputChange(event) {
@@ -69,6 +69,7 @@ function mapStateToProps(state) {
         const {posts, filter_category, search_input} = state.postReducer;
         const display_post = filter_category===''?posts:posts.filter((post)=>post.category===filter_category);
         return {
+                user: state.userReducer.user,
                 posts: search_input===''?display_post:display_post.filter(post=>post.title.toLowerCase().includes(search_input.toLowerCase())),
         }
 }
