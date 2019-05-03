@@ -37,6 +37,8 @@ class Login extends Component {
             university: "",
             classStanding: "",
             major: "",
+            user: "",
+            signedIn: false,
           };
         }
         handleCloseSign() {
@@ -68,6 +70,7 @@ class Login extends Component {
             //  console.log(this.state)
           //)
           var accountObj;
+          var self = this;
           axios.post("http://127.0.0.1:4000/users/signup", {
                       email: email,
                       username: username,
@@ -80,10 +83,16 @@ class Login extends Component {
                       //expectedGraduation: "2019-04-23T12:05:36.000+00:00",
                   })
                   .then(function (response) {
-                          //console.log(response);
+                          console.log("YOLO");
+                          console.log(response);
                           accountObj = response["data"]["user"];
                           console.log(accountObj);
-
+                          if (accountObj) {
+                            self.setState({
+                              signedIn: true,
+                              user: accountObj
+                            });
+                          }
                   })
                   .catch(function (err) {
                           console.log(err);
@@ -111,16 +120,26 @@ class Login extends Component {
           var accountObj;
 
         //  return dispatch =>
+          var self = this;
           axios.post("http://127.0.0.1:4000/users/login", {
                       email: email,
                       password: password,
                       //expectedGraduation: "2019-04-23T12:05:36.000+00:00",
                   })
                   .then(function (response) {
-                          //console.log(response)
+                          console.log(response);
+                          console.log("YOLO");
                           accountObj = response["data"]["user"];
-                          console.log(accountObj)
+                          //console.log(accountObj);
                           //dispatch(push('/home'))
+                          if (accountObj) {
+                            self.setState({
+                              signedIn: true,
+                              user: accountObj
+                            });
+                          }
+                          
+                          // console.log(self.state);
                   })
                   .catch(function (err) {
                           console.log(err);
@@ -135,6 +154,12 @@ class Login extends Component {
         }
 
         render() {
+          if (this.state.signedIn) {
+            return <Redirect to={{
+              pathname: '/home',
+              state: { loggedInUser: this.state.user}
+            }} />;
+          }
                 var secStyle = {
                   backgroundColor: "#efefef",
                   height: "300px",
@@ -218,7 +243,7 @@ class Login extends Component {
                 var FontAwesome = require('react-fontawesome');
                 return (
                   <div className ="LoginPage">
-                        <NavigationBarLogin/>
+                        {/* <NavigationBarLogin/> */}
                         <div>
                           <img src={Banner} style = {styles.img} alt="Free Image of Network Nodes"/>
                           <Button variant="primary" onClick={this.handleShowSign} style={modalSign}>

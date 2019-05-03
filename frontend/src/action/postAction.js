@@ -3,7 +3,7 @@ import axios from 'axios';
 export function fetchPosts() {
   return dispatch => {
     return axios.get("http://127.0.0.1:4000/posts", {
-
+        
     })
       .then(function (response) {
               dispatch(fetchPostsSuccess(response.data.data));

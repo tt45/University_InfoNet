@@ -19,6 +19,9 @@ class Home extends Component {
         }
 
         async componentDidMount() {
+                
+                console.log(this.props.location.state);
+                const user = this.props.location.state.loggedInUser;
                 await this.props.dispatch(fetchUser());
                 await this.props.dispatch(fetchPosts());
         }
@@ -36,6 +39,7 @@ class Home extends Component {
         }
 
         render() {
+                
                 const {posts} = this.props;
                 return (
                         <div className='home_page'>

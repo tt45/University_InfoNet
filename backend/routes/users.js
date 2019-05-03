@@ -89,7 +89,6 @@ router.post('/signup', auth.optional, (req, res, next) => {
 
 		return finalUser.save()
 		  .then(() => res.json({ user: finalUser.toAuthJSON() }));
-
 	})
 	.catch(err => {
 		res.status(500).json({
