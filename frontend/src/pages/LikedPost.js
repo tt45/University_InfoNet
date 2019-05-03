@@ -3,12 +3,13 @@ import { connect } from "react-redux";
 
 import PostItem from '../components/PostItem';
 
-import {fetchLikePost} from '../action/userAction';
+import {fetchLikePost, fetchUser} from '../action/userAction';
 
 class LikedPost extends Component {
 
         componentDidMount() {
                 this.props.dispatch(fetchLikePost(this.props.user._id));
+                this.props.dispatch(fetchUser(this.props.user._id));
         }
 
         render () {

@@ -4,7 +4,7 @@ import history from '../history';
 
 export function fetchUser(user_id) {
   return dispatch => {
-    return axios.get("http://127.0.0.1:4000/users/"+user_id, {
+    return axios.get("https://cs498-infonet.herokuapp.com/users/"+user_id, {
 
     })
       .then(function (response) {
@@ -20,7 +20,7 @@ export function fetchUser(user_id) {
 
 export function fetchOwnPost(user_id) {
   return dispatch => {
-    return axios.get("http://127.0.0.1:4000/posts/user/"+user_id, {
+    return axios.get("https://cs498-infonet.herokuapp.com/posts/user/"+user_id, {
 
     })
       .then(function (response) {
@@ -37,7 +37,7 @@ export function fetchOwnPost(user_id) {
 export function fetchLikePost(user_id) {
         console.log(user_id);
   return dispatch => {
-    return axios.get("http://127.0.0.1:4000/users/liked/posts/"+user_id, {
+    return axios.get("https://cs498-infonet.herokuapp.com/users/liked/posts/"+user_id, {
 
     })
       .then(function (response) {
@@ -53,7 +53,7 @@ export function fetchLikePost(user_id) {
 
 export function logIn(email, password) {
         return dispatch => {
-                return axios.post("http://127.0.0.1:4000/users/login", {
+                return axios.post("https://cs498-infonet.herokuapp.com/users/login", {
                             email: email,
                             password: password,
                         })
@@ -79,7 +79,7 @@ export function logIn(email, password) {
 export function signUp(email, username, password, university, first, last, major, classStanding) {
         console.log(email, username, password, university, first, last, major, classStanding)
         return dispatch => {
-                return axios.post("http://127.0.0.1:4000/users/signup", {
+                return axios.post("https://cs498-infonet.herokuapp.com/users/signup", {
                             email: email,
                             username: username,
                             password: password,
@@ -92,6 +92,12 @@ export function signUp(email, username, password, university, first, last, major
                         })
                         .then(function (response) {
                                 console.log(response)
+                                dispatch(fetchUserSuccess(response.data.user));
+                                //dispatch(push('/home'));
+                                //dispatch(push('/home'));
+                                if (response.data.user) {
+                                        history.push('/home');
+                                }
                         })
                         .catch(function (err) {
                                 console.log(err);

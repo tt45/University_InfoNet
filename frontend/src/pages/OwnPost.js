@@ -3,11 +3,12 @@ import { connect } from "react-redux";
 
 import PostItem from '../components/PostItem';
 
-import {fetchOwnPost} from '../action/userAction';
+import {fetchOwnPost, fetchUser} from '../action/userAction';
 
 class OwnPost extends Component {
 
         componentDidMount() {
+                this.props.dispatch(fetchOwnPost(this.props.user._id));
                 this.props.dispatch(fetchOwnPost(this.props.user._id));
         }
 

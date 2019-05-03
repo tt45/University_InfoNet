@@ -2,7 +2,7 @@ import axios from 'axios';
 import {fetchPosts} from './postAction';
 
 export function fetchPost(post_id) {
-        var request_arr = ["http://127.0.0.1:4000/posts/"+post_id, "http://127.0.0.1:4000/comments/post/"+post_id]
+        var request_arr = ["https://cs498-infonet.herokuapp.com/posts/"+post_id, "https://cs498-infonet.herokuapp.com/comments/post/"+post_id]
         return dispatch => {
                 Promise.all(
                         request_arr.map(request=>
@@ -25,7 +25,7 @@ export function fetchPost(post_id) {
 
 export function submitCommentToPost(input, user_id, post_id) {
         return dispatch => {
-                axios.post("http://127.0.0.1:4000/comments/post", {
+                axios.post("https://cs498-infonet.herokuapp.com/comments/post", {
                         postId: post_id,
                         context: input,
                         commentedBy: user_id,
@@ -42,7 +42,7 @@ export function submitCommentToPost(input, user_id, post_id) {
 export function likePost(post_id, user_id) {
         console.log(post_id, user_id);
         return dispatch => {
-                axios.post("http://127.0.0.1:4000/posts/like", {
+                axios.post("https://cs498-infonet.herokuapp.com/posts/like", {
                         postId: post_id,
                         userId: user_id
                 })
@@ -58,7 +58,7 @@ export function likePost(post_id, user_id) {
 
 export function unlikePost(post_id, user_id) {
         return dispatch => {
-                axios.post("http://127.0.0.1:4000/posts/unlike", {
+                axios.post("https://cs498-infonet.herokuapp.com/posts/unlike", {
                         postId: post_id,
                         userId: user_id
                 })
@@ -74,7 +74,7 @@ export function unlikePost(post_id, user_id) {
 
 export function deleteComment(post_id, comment_id) {
         return dispatch => {
-                axios.delete("http://127.0.0.1:4000/comments/"+comment_id, {
+                axios.delete("https://cs498-infonet.herokuapp.com/comments/"+comment_id, {
 
                 })
                 .then(function (response){

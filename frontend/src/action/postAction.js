@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export function fetchPosts(user_id, university) {
   return dispatch => {
-    return axios.get("http://127.0.0.1:4000/posts", {
+    return axios.get("https://cs498-infonet.herokuapp.com/posts", {
             _id: user_id,
             university: university,
     })
@@ -18,7 +18,7 @@ export function fetchPosts(user_id, university) {
 
 export function createPost(user_id, title, category, context) {
         return dispatch => {
-                return axios.post("http://127.0.0.1:4000/posts", {
+                return axios.post("https://cs498-infonet.herokuapp.com/posts", {
                                 postedBy: user_id,
                                 title: title,
                                 category: category,
