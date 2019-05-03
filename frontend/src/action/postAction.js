@@ -3,17 +3,34 @@ import axios from 'axios';
 export function fetchPosts() {
   return dispatch => {
     return axios.get("http://127.0.0.1:4000/posts", {
-
+        
     })
       .then(function (response) {
               dispatch(fetchPostsSuccess(response.data.data));
-              console.log(response.data.data, 'fetch posts')
       })
       .catch(function (error) {
               console.log(error);
               dispatch(fetchPostsFailure(error))
       });
   };
+}
+
+export function createPost(user_id, title, category, context) {
+        return dispatch => {
+                return axios.post("http://127.0.0.1:4000/posts", {
+                                postedBy: user_id,
+                                title: title,
+                                category: category,
+                                context: context,
+                        })
+                        .then(function (response) {
+                                console.log(response)
+                                dispatch(fetchPosts())
+                        })
+                        .catch(function (err) {
+                                console.log(err);
+                        })
+        }
 }
 
 export const fetchPostsSuccess = posts => ({

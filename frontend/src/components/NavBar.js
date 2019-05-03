@@ -19,10 +19,13 @@ class NavigationBar extends Component {
                             <Nav className="ml-auto">
                             <NavDropdown title={<FaUser/>} className="dropDown" id="collasible-nav-dropdown" alignRight>
 
+                                <LinkContainer to={'/CreatePost'}>
+                                        <NavDropdown.Item href="createPost">Create Post</NavDropdown.Item>
+                                </LinkContainer>
                                 <NavDropdown.Item href="action/3.2">Liked</NavDropdown.Item>
                                 <NavDropdown.Item href="action/3.3">Own Posts</NavDropdown.Item>
                                 <LinkContainer to={'/profile'} exact>
-                                <NavDropdown.Item >Profile</NavDropdown.Item>
+                                        <NavDropdown.Item >Profile</NavDropdown.Item>
                                 </LinkContainer>
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item href="/login">Logout</NavDropdown.Item>

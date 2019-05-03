@@ -5,7 +5,8 @@ import { connect } from "react-redux";
 import './Home.scss'
 import PostItem from '../components/PostItem';
 import {filterPosts, searchPosts} from '../action/postAction'
-
+import {fetchUser} from '../action/userAction';
+import {fetchPosts} from '../action/postAction';
 
 class Home extends Component {
         constructor(props) {
@@ -15,6 +16,14 @@ class Home extends Component {
                 }
                 this.inputChange = this.inputChange.bind(this);
                 this.handleSubmit = this.handleSubmit.bind(this);
+        }
+
+        async componentDidMount() {
+                
+                console.log(this.props.location.state);
+                const user = this.props.location.state.loggedInUser; // Access the user passed in from frontend Login Authentication
+                await this.props.dispatch(fetchUser());
+                await this.props.dispatch(fetchPosts());
         }
 
         inputChange(event) {
@@ -27,10 +36,10 @@ class Home extends Component {
 
         handleCategory(category) {
                 this.props.dispatch(filterPosts(category));
-
         }
 
         render() {
+                
                 const {posts} = this.props;
                 return (
                         <div className='home_page'>
@@ -46,15 +55,15 @@ class Home extends Component {
                                 </InputGroup>
                                 <ButtonToolbar className='button_group'>
                                   <Button variant="outline-dark" onClick={()=>this.handleCategory('')}>All</Button>
-                                  <Button variant="outline-primary" onClick={()=>this.handleCategory('food')}>Food</Button>
-                                  <Button variant="outline-secondary" onClick={()=>this.handleCategory('housing')}>Housing</Button>
-                                  <Button variant="outline-success" onClick={()=>this.handleCategory('events')}>Events</Button>
-                                  <Button variant="outline-warning" onClick={()=>this.handleCategory('health')}>Health</Button>
-                                  <Button variant="outline-danger" onClick={()=>this.handleCategory('course')}>Course</Button>
-                                  <Button variant="outline-info" onClick={()=>this.handleCategory('miscellaneous')}>Misc.</Button>
+                                  <Button variant="outline-primary" onClick={()=>this.handleCategory('Food')}>Food</Button>
+                                  <Button variant="outline-secondary" onClick={()=>this.handleCategory('Housing')}>Housing</Button>
+                                  <Button variant="outline-success" onClick={()=>this.handleCategory('Events')}>Events</Button>
+                                  <Button variant="outline-warning" onClick={()=>this.handleCategory('Health')}>Health</Button>
+                                  <Button variant="outline-danger" onClick={()=>this.handleCategory('Course')}>Course</Button>
+                                  <Button variant="outline-info" onClick={()=>this.handleCategory('Miscellaneous')}>Misc.</Button>
                                 </ButtonToolbar>
                                 {posts.map((post)=>
-                                        <PostItem key={post._id} {...post}/>)}
+                                        <PostItem key={post._id} post={post}/>)}
                         </div>
                 )
         }
@@ -64,14 +73,8 @@ function mapStateToProps(state) {
         const {posts, filter_category, search_input} = state.postReducer;
         const display_post = filter_category===''?posts:posts.filter((post)=>post.category===filter_category);
         return {
-                posts: search_input===''?display_post:display_post.filter(post=>post.title.includes(search_input)),
+                posts: search_input===''?display_post:display_post.filter(post=>post.title.toLowerCase().includes(search_input.toLowerCase())),
         }
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    filterPosts: (category) => {dispatch(filterPosts(category))}
-  };
 }
 
 export default connect(mapStateToProps)(Home);

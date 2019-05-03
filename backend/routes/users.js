@@ -39,7 +39,7 @@ router.get('/', function(req, res) {
 
 //POST new user route (optional, everyone has access)
 router.post('/signup', auth.optional, (req, res, next) => {
-
+	console.log(req.body);
 	if (!req.body.email) {
 		return res.status(422).json({
 			message: "Email is required!"
@@ -84,12 +84,11 @@ router.post('/signup', auth.optional, (req, res, next) => {
 			year: req.body.year,
 			expectedGraduation: req.body.expectedGraduation,
 		});
-  
+
 		finalUser.setPassword(req.body.password);
-	  
+
 		return finalUser.save()
 		  .then(() => res.json({ user: finalUser.toAuthJSON() }));
-
 	})
 	.catch(err => {
 		res.status(500).json({
@@ -97,22 +96,22 @@ router.post('/signup', auth.optional, (req, res, next) => {
 		});
 	});
   });
-  
+
   //POST login route (optional, everyone has access)
   router.post('/login', auth.optional, (req, res, next) => {
-  
+
 	if(!req.body.email) {
 	  return res.status(422).json({
 		message: "email is required"
 	  });
 	}
-  
+
 	if(!req.body.password) {
 	  return res.status(422).json({
 		message: "password is required"
 	  });
 	}
-  
+
 	return passport.authenticate('local', { session: false }, (err, passportUser, info) => {
 	  if(err) {
 		return next(err);
@@ -120,12 +119,12 @@ router.post('/signup', auth.optional, (req, res, next) => {
 	  if(passportUser) {
 		const user = passportUser;
 		user.token = passportUser.generateJWT();
-		return res.json({ 
-				userToken: user.toAuthJSON(),
-				user: user
+		return res.json({
+				user: user.toAuthJSON(),
+				// user: user
 			});
 	  }
-	  
+
 	  return res.json({
 		  error: "Email or password does not match"
 	  });

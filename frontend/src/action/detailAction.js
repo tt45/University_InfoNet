@@ -1,45 +1,94 @@
 import axios from 'axios';
+import {fetchPosts} from './postAction';
 
 export function fetchPost(post_id) {
-  return dispatch => {
-    return axios.get("http://127.0.0.1:4000/posts/"+post_id, {
-
-    })
-      .then(function (response) {
-              dispatch(fetchPostSuccess(response.data.data));
-              console.log(response.data.data, 'fetch detail')
-      })
-      .catch(function (error) {
-              console.log(error);
-              dispatch(fetchPostFailure(error))
-      });
-  };
-}
-
-export function fetchPostComment(comment_arr) {
-        var comment_objects = [];
+        var request_arr = ["http://127.0.0.1:4000/posts/"+post_id, "http://127.0.0.1:4000/comments/post/"+post_id]
         return dispatch => {
-                console.log('fetch comments with post')
                 Promise.all(
-                        comment_arr.map(comment_id=>
-                                axios.get("http://127.0.0.1:4000/comments/"+comment_id)
-                                .then(function(response) {
-                                        console.log(response)
-                                })
-                                .catch(function(err) {
-                                        console.log(err);
-                                })
+                        request_arr.map(request=>
+                                        axios.get(request)
+                                        .then(function(response) {
+                                                return response.data
+                                        })
+                                        .catch(function(err) {
+                                                console.log(err);
+                                        })
                         )
-                ).then(responses =>
-                        console.log(responses)
-
-                ).catch()
+                )
+                .then(responses => {
+                        console.log(responses);
+                        dispatch(fetchPostSuccess(responses[0].data, responses[1].data));
+                })
+                .catch(err => console.log(err))
         }
 }
 
-export const fetchPostSuccess = post => ({
+export function submitCommentToPost(input, user_id, post_id) {
+        return dispatch => {
+                axios.post("http://127.0.0.1:4000/comments/post", {
+                        postId: post_id,
+                        context: input,
+                        commentedBy: user_id,
+                })
+                .then(function (response){
+                        dispatch(fetchPost(post_id));
+                })
+                .catch(function (err) {
+                        console.log(err);
+                })
+        }
+}
+
+export function likePost(post_id, user_id) {
+        return dispatch => {
+                axios.post("http://127.0.0.1:4000/posts/like", {
+                        postId: post_id,
+                        userId: user_id
+                })
+                .then(function (response){
+                        console.log(response);
+                        dispatch(fetchPosts());
+                })
+                .catch(function (err) {
+                        console.log(err);
+                })
+        }
+}
+
+export function unlikePost(post_id, user_id) {
+        return dispatch => {
+                axios.post("http://127.0.0.1:4000/posts/unlike", {
+                        postId: post_id,
+                        userId: user_id
+                })
+                .then(function (response){
+                        console.log(response);
+                        dispatch(fetchPosts());
+                })
+                .catch(function (err) {
+                        console.log(err);
+                })
+        }
+}
+
+export function deleteComment(post_id, comment_id) {
+        return dispatch => {
+                axios.delete("http://127.0.0.1:4000/comments/"+comment_id, {
+
+                })
+                .then(function (response){
+                        console.log(response);
+                        dispatch(fetchPost(post_id));
+                })
+                .catch(function (err) {
+                        console.log(err);
+                })
+        }
+}
+
+export const fetchPostSuccess = (post, comments) => ({
         type: "FETCH_POST_SUCCESS",
-        payload: { post }
+        payload: { post, comments }
 });
 
 export const fetchPostFailure = error => ({

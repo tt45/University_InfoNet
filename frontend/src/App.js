@@ -6,7 +6,9 @@ import './App.css';
 import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
-import PostDetail from './pages/PostDetail'
+import PostDetail from './pages/PostDetail';
+import CreatePost from './pages/CreatePost';
+import Login from './pages/Login';
 
 import {fetchUser} from './action/userAction';
 import {fetchPosts} from './action/postAction';
@@ -24,8 +26,10 @@ class App extends Component {
                         <Router basename={process.env.PUBLIC_URL}>
                                 <NavBar/>
                                 <Switch>
+                                  <Route path='/login' component={Login}/>
                                   <Route path='/home' component={Home}/>
                                   <Route path='/profile' component={Profile}/>
+                                  <Route path='/createPost' component={CreatePost}/>
                                   <Route path='/posts/:post_id' component={PostDetail}/>
                                 </Switch>
                         </Router>
