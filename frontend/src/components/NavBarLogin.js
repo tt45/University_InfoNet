@@ -9,7 +9,7 @@ class NavigationBarLogin extends Component {
           var Scroll = require('react-scroll');
           var scroll = Scroll.animateScroll;
           scroll.scrollToTop();
-          
+
                 return (
                   <Navbar bg="dark" variant="dark" sticky='top'>
                     <Link

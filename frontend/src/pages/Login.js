@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import {InputGroup, Form, FormGroup, FormControl, Button, ButtonToolbar, Container, Col, Row, Modal} from 'react-bootstrap';
+import {Form, FormGroup, FormControl, Button, ButtonToolbar, Container, Col, Row, Modal} from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import { connect } from "react-redux";
 
 import NavigationBarLogin from '../components/NavBarLogin';
 import Section from '../components/Section';
@@ -8,9 +10,9 @@ import Banner from '../banner.jpg'
 import styles from './Login.scss'
 
 import 'font-awesome/css/font-awesome.min.css';
-import {BrowserRouter as Router} from 'react-router-dom';
+import axios from 'axios';
 
-
+import {logIn, signUp} from '../action/userAction';
 
 class Login extends Component {
         constructor(props, context) {
@@ -20,32 +22,79 @@ class Login extends Component {
           this.handleCloseSign = this.handleCloseSign.bind(this);
           this.handleShowLogin = this.handleShowLogin.bind(this);
           this.handleCloseLogin = this.handleCloseLogin.bind(this);
+          this.handleFormSubmit = this.handleFormSubmit.bind(this);
+          this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
 
           this.state = {
             signupShow: false,
             loginShow: false,
+            first: "",
+            last: "",
             email: "",
             password: "",
             username: "",
             university: "",
+            classStanding: "",
+            major: "",
           };
         }
-
-        validateForm() {
-          var split = this.state.email.split(".");
-          var edu = split[split.length - 1];
-          if(edu == "edu"){
-            return this.state.email.length > 0 && this.state.password.length > 0
-          }
-        }
-
         handleCloseSign() {
           this.setState({signupShow: false });
         }
         handleShowSign() {
           this.setState({signupShow: true });
         }
+        async handleFormSubmit(e){
+          var first = this.inputF.value;
+          var last = this.inputL.value;
+          var email = this.email.value;
+          //Check if email is a student email
+          var split = email.split(".");
+          var edu = split[split.length - 1];
+          if(edu === "edu"){
+            console.log("Success");
+          }else{
+            alert("ERROR: Not a Student Email!")
+            return;
+          }
+          var password = this.pass.value;
+          var username = this.user.value;
+          var university= this.college.value;
+          var classStanding=this.standing.value;
+          var major =this.major.value;
+          //Set the State
+          //await this.setState({first: first, last: last, email: email, password: password, username:username, university: university, classStanding: classStanding,major:major}, () =>
+            //  console.log(this.state)
+          //)
+          var accountObj;
+          this.props.dispatch(signUp(email, username, password, university, first, last, major, classStanding))
+                  //Debugging
+          e.preventDefault()
+          //return accountObj;
 
+        }
+        async handleLoginSubmit(e){
+
+          //return <Redirect to="/home"/>;
+
+
+          var email = this.email2.value;
+          var split = email.split(".");
+          var edu = split[split.length - 1];
+          //Check if the email is a student email
+          if(edu === "edu"){
+            console.log("Success");
+          }else{
+            alert("ERROR: Not a Student Email!")
+            return;
+          }
+          var password = this.pass2.value;
+          var accountObj;
+
+          this.props.dispatch(logIn(email, password));
+
+           e.preventDefault();
+        }
         handleCloseLogin() {
           this.setState({loginShow: false });
         }
@@ -102,7 +151,6 @@ class Login extends Component {
                  position: "absolute",
                  top: "45%",
                  left: "50%",
-                 backgroundColor: "#555",
                  color: "white",
                  backgroundColor: "blue",
                  fontSize: "16px",
@@ -138,7 +186,7 @@ class Login extends Component {
                 var FontAwesome = require('react-fontawesome');
                 return (
                   <div className ="LoginPage">
-                        <NavigationBarLogin/>
+
                         <div>
                           <img src={Banner} style = {styles.img} alt="Free Image of Network Nodes"/>
                           <Button variant="primary" onClick={this.handleShowSign} style={modalSign}>
@@ -148,86 +196,102 @@ class Login extends Component {
                             Login
                           </Button>
                           <Modal show={this.state.signupShow} onHide={this.handleCloseSign}>
-                            <Modal.Header closeButton>
-                              <Modal.Title>Sign Up</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>Please fill out all the information</Modal.Body>
-                            <Form style = {signupForm}>
-                              <Form.Group controlId="formBasicEmail">
-                                <Form.Label >Student Email address</Form.Label>
-                                <Form.Control type="email" placeholder="example@email.edu" />
-                                <Form.Text className="text-muted">
-                                  We'll never share your email with anyone else.
-                                </Form.Text>
-                              </Form.Group>
-                              <Form.Group controlId="formBasicPassword">
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control type="password" placeholder="Password" />
-                              </Form.Group>
-                              <Form.Group controlId="formBasicPassword">
-                                <Form.Label>Verify Password</Form.Label>
-                                <Form.Control type="password" placeholder="Password" />
-                              </Form.Group>
-                              <Form.Group controlId="formBasicUsername">
-                                <Form.Label>Username</Form.Label>
-                                <Form.Control type="username" placeholder="Enter Username" />
-                              </Form.Group>
-                              <Form.Group controlId="exampleForm.ControlSelect1">
-                              <Form.Label>University</Form.Label>
-                              <Form.Control as="select">
-                                <option>Select...</option>
-                                <option>University of Illinois at Urbana-Champaign</option>
-                                <option>University of Southern California</option>
-                                <option>Purdue University</option>
-                                <option>Ohio State University</option>
-                                <option>University of Michigan at Ann Arbor</option>
-                              </Form.Control>
-                            </Form.Group>
-                            </Form>
-                            <Modal.Footer>
-                              <Button variant="secondary" onClick={this.handleCloseSign}>
-                                Close
-                              </Button>
-                              <Button variant="primary" onClick={this.handleCloseSign}>
-                                Submit
-                              </Button>
-                            </Modal.Footer>
+                              <Modal.Header closeButton>
+                                <Modal.Title>Sign Up</Modal.Title>
+                              </Modal.Header>
+                              <Modal.Body>Please fill out all the information</Modal.Body>
+                              <Form style = {signupForm} onSubmit={this.handleFormSubmit}>
+                                <Form.Group controlId="formFirstName">
+                                  <Form.Label>First Name</Form.Label>
+                                  <Form.Control type="text" placeholder="First Name" ref={fname=> (this.inputF= fname)}/>
+                                </Form.Group>
+                                <Form.Group controlId="formLastName">
+                                  <Form.Label>Last Name</Form.Label>
+                                  <Form.Control type="text" placeholder="Last Name" ref={lname=> (this.inputL=lname)}/>
+                                </Form.Group>
+                                <Form.Group controlId="formBasicEmail">
+                                  <Form.Label >Student Email address</Form.Label>
+                                  <Form.Control type="email" placeholder="example@email.edu" ref={email=>this.email=email}/>
+                                  <Form.Text className="text-muted">
+                                    We'll never share your email with anyone else.
+                                  </Form.Text>
+                                </Form.Group>
+                                <Form.Group controlId="formBasicPassword">
+                                  <Form.Label>Password</Form.Label>
+                                  <Form.Control type="password" placeholder="Password" ref={pass => this.pass=pass}/>
+                                </Form.Group>
+                                <Form.Group controlId="formBasicUsername">
+                                  <Form.Label>Username</Form.Label>
+                                  <Form.Control type="text" placeholder="Enter Username" ref ={user=>this.user=user}/>
+                                </Form.Group>
+                                <Form.Group controlId="exampleForm.ControlSelect1">
+                                <Form.Label>University</Form.Label>
+                                <Form.Control as="select" ref={college=>this.college=college}>
+                                  <option>University of Illinois at Urbana-Champaign</option>
+                                  <option>University of Southern California</option>
+                                  <option>Purdue University</option>
+                                  <option>Ohio State University</option>
+                                  <option>University of Michigan at Ann Arbor</option>
+                                </Form.Control>
+                                </Form.Group>
+                                <Form.Group controlId="exampleForm.ControlSelect2">
+                                  <Form.Label>Class Standing</Form.Label>
+                                  <Form.Control as="select" ref={standing=>this.standing=standing}>
+                                    <option>Freshman</option>
+                                    <option>Sophomore</option>
+                                    <option>Junior</option>
+                                    <option>Senior</option>
+                                    <option>Graduate</option>
+                                  </Form.Control>
+                                </Form.Group>
+                                <Form.Group controlId="formBasicMajor">
+                                  <Form.Label>Major</Form.Label>
+                                  <Form.Control type="text" placeholder="Enter Major" ref={major=> this.major=major} />
+                                </Form.Group>
+                                <Modal.Footer>
+                                  <Button variant="secondary" onClick={this.handleCloseSign}>
+                                    Close
+                                  </Button>
+                                  <Button variant="primary" type="submit" value="Submit">
+                                    Sign Up
+                                  </Button>
+                                </Modal.Footer>
+                              </Form>
                           </Modal>
                           <Modal show={this.state.loginShow} onHide={this.handleCloseLogin}>
                             <Modal.Header closeButton>
                               <Modal.Title>Login</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>Please Login with your credentials</Modal.Body>
-                            <Form style = {loginForm}>
+                            <Form style = {loginForm} onSubmit={this.handleLoginSubmit}>
                               <Form.Group controlId="formBasicEmail">
                                 <Form.Label>Email address</Form.Label>
-                                <Form.Control type="email" placeholder="Enter email" />
+                                <Form.Control type="email" placeholder="Enter email" ref={email2 => this.email2 = email2} />
                                 <Form.Text className="text-muted">
                                   We'll never share your email with anyone else.
                                 </Form.Text>
                               </Form.Group>
                               <Form.Group controlId="formBasicPassword">
                                 <Form.Label>Password</Form.Label>
-                                <Form.Control type="password" placeholder="Password" />
+                                <Form.Control type="password" placeholder="Password" ref={pass2 => this.pass2=pass2} />
                               </Form.Group>
+                              <Modal.Footer>
+                                <Button variant="secondary" onClick={this.handleCloseLogin}>
+                                  Close
+                                </Button>
+                                <Button variant="primary" type="submit" value="Submit">
+                                  Login
+                                </Button>
+                              </Modal.Footer>
                             </Form>
-                            <Modal.Footer>
-                              <Button variant="secondary" onClick={this.handleCloseLogin}>
-                                Close
-                              </Button>
-                              <Button variant="primary" type="submit" onClick={this.handleCloseLogin}>
-                                Submit
-                              </Button>
-                            </Modal.Footer>
                           </Modal>
                         </div>
                         <div style = {secStyle}>
                           <Section
                               title = "ABOUT US"
-                              subtitle =
-                              <p>We are an organization that helps students find the right resources based on the school that they are attending. <br/> We allow students to interact with each other and find out what is occurring on campus as well as in the city that they will be in.<br/>
-                              The goal is to create a positive community where people with real questions can get real applicable answers. It helps students with the <br/> college experience and helps them be involved with the community that they will call home for the next few years.
-                              </p>
+                              subtitle = "We are an organization that helps students find the right resources based on the school that they are attending. We allow students to interact with each other and find out what is occurring on campus as well as in the city that they will be in.
+                              The goal is to create a positive community where people with real questions can get real applicable answers. It helps students with the college experience and helps them be involved with the community that they will call home for the next few years."
+
                               dark ={true}
                               id="about"
                             />
@@ -289,4 +353,4 @@ class Login extends Component {
         }
 }
 
-export default Login;
+export default connect()(Login);
